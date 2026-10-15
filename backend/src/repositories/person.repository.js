@@ -51,3 +51,12 @@ export async function getSkillNames(githubLogins) {
   );
   return res.data.map((row) => row.name);
 }
+
+export async function findExisting(githubLogins) {
+  const graph = await getGraph();
+  const res = await graph.roQuery(
+    'MATCH (p:Person) WHERE p.githubLogin IN $githubLogins RETURN p.githubLogin AS githubLogin',
+    { params: { githubLogins } }
+  );
+  return res.data.map((row) => row.githubLogin);
+}
