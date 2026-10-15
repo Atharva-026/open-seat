@@ -40,3 +40,14 @@ export async function getProfile(githubLogin) {
   if (!row) return null;
   return { ...row, skills: row.skills.filter((s) => s.name) };
 }
+
+export async function getSkillNames(githubLogins) {
+  const graph = await getGraph();
+  const res = await graph.roQuery(
+    `MATCH (p:Person)-[:HAS_SKILL]->(s:Skill)
+     WHERE p.githubLogin IN $githubLogins
+     RETURN DISTINCT s.name AS name`,
+    { params: { githubLogins } }
+  );
+  return res.data.map((row) => row.name);
+}
