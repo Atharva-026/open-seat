@@ -18,6 +18,7 @@ export const env = {
     callbackUrl: process.env.GITHUB_CALLBACK_URL ?? 'http://localhost:3001/auth/github/callback',
   },
   groqApiKey: process.env.GROQ_API_KEY,
+  sessionSecret: process.env.SESSION_SECRET,
 };
 
 // Call once at server startup so a missing key fails loudly, not mid-request.
@@ -26,6 +27,7 @@ export function assertEnv() {
     ['GITHUB_CLIENT_ID', env.github.clientId],
     ['GITHUB_CLIENT_SECRET', env.github.clientSecret],
     ['GROQ_API_KEY', env.groqApiKey],
+    ['SESSION_SECRET', env.sessionSecret],
   ].filter(([, value]) => !value).map(([name]) => name);
 
   if (missing.length) {

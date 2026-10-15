@@ -1,0 +1,42 @@
+import { getGraph } from '../db/client.js';
+
+export async function upsertPerson({ githubLogin, name, avatarUrl }) {
+  const graph = await getGraph();
+  await graph.query(
+    `MERGE (p:Person {githubLogin: $githubLogin})
+     SET p.name = $name, p.avatarUrl = $avatarUrl, p.isDemo = false`,
+    { params: { githubLogin, name, avatarUrl } }
+  );
+}
+
+export async function replaceSkills(githubLogin, skills) {
+  const graph = await getGraph();
+  await graph.query(
+    'MATCH (:Person {githubLogin: $githubLogin})-[r:HAS_SKILL]->() DELETE r',
+    { params: { githubLogin } }
+  );
+  if (!skills.length) return;
+  await graph.query(
+    `MATCH (p:Person {githubLogin: $githubLogin})
+     UNWIND $skills AS s
+     MERGE (sk:Skill {name: s.name})
+     SET sk.category = s.category
+     MERGE (p)-[r:HAS_SKILL]->(sk)
+     SET r.level = s.level, r.evidence = s.evidence`,
+    { params: { githubLogin, skills } }
+  );
+}
+
+export async function getProfile(githubLogin) {
+  const graph = await getGraph();
+  const res = await graph.roQuery(
+    `MATCH (p:Person {githubLogin: $githubLogin})
+     OPTIONAL MATCH (p)-[r:HAS_SKILL]->(s:Skill)
+     RETURN p.githubLogin AS githubLogin, p.name AS name, p.avatarUrl AS avatarUrl,
+            collect({name: s.name, category: s.category, level: r.level, evidence: r.evidence}) AS skills`,
+    { params: { githubLogin } }
+  );
+  const row = res.data?.[0];
+  if (!row) return null;
+  return { ...row, skills: row.skills.filter((s) => s.name) };
+}
