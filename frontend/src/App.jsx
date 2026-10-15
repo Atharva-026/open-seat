@@ -3,6 +3,7 @@ import Logo from './components/Logo.jsx';
 import SignInCard from './components/SignInCard.jsx';
 import SkillGraph from './components/SkillGraph.jsx';
 import SkillList from './components/SkillList.jsx';
+import MatchPanel from './components/MatchPanel.jsx';
 
 export default function App() {
   const { status, profile, signOut } = useProfile();
@@ -24,10 +25,13 @@ export default function App() {
         {status === 'error' && <p className="muted">Could not reach the server. Is the backend running?</p>}
         {status === 'signedOut' && <SignInCard />}
         {status === 'ready' && (
-          <div className="dashboard">
-            <section className="card"><SkillGraph profile={profile} /></section>
-            <section className="card"><SkillList skills={profile.skills} /></section>
-          </div>
+          <>
+            <div className="dashboard">
+              <section className="card"><SkillGraph profile={profile} /></section>
+              <section className="card"><SkillList skills={profile.skills} /></section>
+            </div>
+            <MatchPanel />
+          </>
         )}
       </main>
     </div>
