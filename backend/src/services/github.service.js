@@ -30,14 +30,14 @@ export async function exchangeCodeForToken(code) {
   return data.access_token;
 }
 
+const githubHeaders = (token) => ({
+  Authorization: `Bearer ${token}`,
+  Accept: 'application/vnd.github+json',
+  'X-GitHub-Api-Version': '2022-11-28',
+});
+
 async function githubGet(path, token) {
-  const res = await fetch(`${API}${path}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-    },
-  });
+  const res = await fetch(`${API}${path}`, { headers: githubHeaders(token) });
   if (!res.ok) throw new HttpError(502, 'Could not read from GitHub');
   return res.json();
 }
@@ -46,3 +46,14 @@ export const fetchUser = (token) => githubGet('/user', token);
 
 export const fetchPublicRepos = (login, token) =>
   githubGet(`/users/${login}/repos?per_page=100&sort=updated&type=owner`, token);
+
+// Returns the file's text, or null if the repo doesn't have it.
+export async function fetchRepoFile(owner, repo, path, token) {
+  const res = await fetch(`${API}/repos/${owner}/${repo}/contents/${path}`, {
+    headers: githubHeaders(token),
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new HttpError(502, 'Could not read from GitHub');
+  const data = await res.json();
+  return data.content ? Buffer.from(data.content, 'base64').toString('utf8') : null;
+}
