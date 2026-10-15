@@ -1,3 +1,5 @@
+import IntroPath from './IntroPath.jsx';
+
 export default function CandidateCard({ candidate }) {
   const { name, githubLogin, isDemo, score, fills, reasons } = candidate;
 
@@ -16,6 +18,7 @@ export default function CandidateCard({ candidate }) {
           <span key={f.name} className="chip chip-fill">{f.name} · L{f.level}</span>
         ))}
       </div>
+      {candidate.intro && <IntroPath intro={candidate.intro} />}
       <ul className="reasons">
         {reasons.map((reason) => <li key={reason}>{reason}</li>)}
       </ul>

@@ -18,3 +18,22 @@ export async function findCandidates({ team, gap }) {
   );
   return res.data;
 }
+
+// Mutual teammates: someone on the team worked with `via`, who worked with a candidate.
+export async function findIntroducers({ team, candidates }) {
+  const graph = await getGraph();
+  const res = await graph.roQuery(
+    `MATCH (a:Person)-[t1:TEAMED_WITH]-(mid:Person)-[t2:TEAMED_WITH]-(b:Person)
+     WHERE a.githubLogin IN $team
+       AND b.githubLogin IN $candidates
+       AND NOT mid.githubLogin IN $team
+       AND mid.githubLogin <> b.githubLogin
+       AND t1.rating >= 3 AND t2.rating >= 3
+     RETURN a.githubLogin AS fromLogin, a.name AS fromName,
+            mid.githubLogin AS viaLogin, mid.name AS viaName,
+            b.githubLogin AS toLogin,
+            t1.rating AS ratingFrom, t2.rating AS ratingTo`,
+    { params: { team, candidates } }
+  );
+  return res.data;
+}
