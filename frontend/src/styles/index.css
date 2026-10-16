@@ -86,3 +86,8 @@ button.button { border: 0; cursor: pointer; font: inherit; font-weight: 700; }
 .status-pending, .status-forming { border-color: var(--accent); color: var(--accent); }
 .invites { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
 .invites li { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+
+.tray { position: sticky; bottom: 16px; z-index: 5; margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; border-color: var(--accent); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25); }
+.tray > div { flex: 1 1 220px; }
+.tray input { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; }
+.tray .button { margin-top: 0; }

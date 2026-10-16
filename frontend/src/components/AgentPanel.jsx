@@ -13,7 +13,7 @@ const ERRORS = {
   429: 'The AI service is busy. Please try again in a moment.',
 };
 
-export default function AgentPanel({ onDone }) {
+export default function AgentPanel({ onDone, proposal }) {
   const { status, result, errorStatus, ask } = useAgent();
   const [text, setText] = useState('');
 
@@ -60,7 +60,15 @@ export default function AgentPanel({ onDone }) {
         <div className="results">
           <p className="answer">{result.answer}</p>
           <AgentSteps steps={result.steps} />
-          {result.candidates.map((c) => <CandidateCard key={c.githubLogin} candidate={c} />)}
+          {result.candidates.map((c) => (
+            <CandidateCard
+              key={c.githubLogin}
+              candidate={c}
+              added={proposal.has(c.githubLogin)}
+              canAdd={proposal.canAdd}
+              onToggle={proposal.toggle}
+            />
+          ))}
         </div>
       )}
     </section>

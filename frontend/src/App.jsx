@@ -3,6 +3,7 @@ import { useProfile } from './hooks/useProfile.js';
 import { useTeams } from './hooks/useTeams.js';
 import { useInbox } from './hooks/useInbox.js';
 import { useMemory } from './hooks/useMemory.js';
+import { useProposal } from './hooks/useProposal.js';
 import Logo from './components/Logo.jsx';
 import SignInCard from './components/SignInCard.jsx';
 import SkillGraph from './components/SkillGraph.jsx';
@@ -12,10 +13,12 @@ import MatchPanel from './components/MatchPanel.jsx';
 import TeamsPanel from './components/TeamsPanel.jsx';
 import MemoryPanel from './components/MemoryPanel.jsx';
 import InboxPanel from './components/InboxPanel.jsx';
+import ProposalBox from './components/ProposalBox.jsx';
 
 export default function App() {
   const { status, profile, signOut } = useProfile();
   const { teams, refresh } = useTeams();
+  const proposal = useProposal(refresh);
   const { invites, respond } = useInbox(refresh);
   const { memory, refresh: refreshMemory, save, forget, forgetAll } = useMemory();
   const [teammates, setTeammates] = useState('');
@@ -43,11 +46,12 @@ export default function App() {
               <section className="card"><SkillGraph profile={profile} /></section>
               <section className="card"><SkillList skills={profile.skills} /></section>
             </div>
-            <AgentPanel onDone={refreshMemory} />
-            <MatchPanel teammates={teammates} onTeammatesChange={setTeammates} onTeamFormed={refresh} />
+            <AgentPanel onDone={refreshMemory} proposal={proposal} />
+            <MatchPanel teammates={teammates} onTeammatesChange={setTeammates} proposal={proposal} />
             <TeamsPanel teams={teams} me={profile.githubLogin}
                         onUseTeam={(logins) => setTeammates(logins.join(', '))} />
             <MemoryPanel memory={memory} onSave={save} onForget={forget} onForgetAll={forgetAll} />
+            <ProposalBox proposal={proposal} />
           </>
         )}
       </main>
