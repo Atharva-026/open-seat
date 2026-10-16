@@ -13,13 +13,18 @@ const ERRORS = {
   429: 'The AI service is busy. Please try again in a moment.',
 };
 
-export default function AgentPanel() {
+export default function AgentPanel({ onDone }) {
   const { status, result, errorStatus, ask } = useAgent();
   const [text, setText] = useState('');
 
+  const run = async (question) => {
+    await ask(question);
+    onDone?.();
+  };
+
   const submit = (event) => {
     event.preventDefault();
-    if (text.trim()) ask(text.trim());
+    if (text.trim()) run(text.trim());
   };
 
   return (
@@ -41,7 +46,7 @@ export default function AgentPanel() {
       <div className="chips examples">
         {EXAMPLES.map((example) => (
           <button key={example} type="button" className="chip"
-                  onClick={() => { setText(example); ask(example); }}>
+                  onClick={() => { setText(example); run(example); }}>
             {example}
           </button>
         ))}

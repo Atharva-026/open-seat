@@ -3,8 +3,24 @@ import * as personRepository from '../repositories/person.repository.js';
 import * as matchRepository from '../repositories/match.repository.js';
 
 const WEIGHTS = { coverage: 0.6, strength: 0.3, trust: 0.1 };
+const PREFERENCE_BONUS = { availability: 5, timezone: 3 };
 
 export const listAvailableSkills = () => skillRepository.listSkills();
+
+// Memory in action: remembered preferences add points and a visible reason.
+function applyPreferences(candidate, preferences) {
+  let bonus = 0;
+  const reasons = [];
+  if (preferences.availability && candidate.availability === preferences.availability) {
+    bonus += PREFERENCE_BONUS.availability;
+    reasons.push(`Matches your remembered preference: ${preferences.availability} availability`);
+  }
+  if (preferences.timezone && candidate.timezone === preferences.timezone) {
+    bonus += PREFERENCE_BONUS.timezone;
+    reasons.push(`Matches your remembered timezone (${preferences.timezone})`);
+  }
+  return { ...candidate, score: Math.min(100, candidate.score + bonus), reasons: [...candidate.reasons, ...reasons] };
+}
 
 function rankCandidate(row, gap) {
   const { fills } = row;
@@ -85,7 +101,7 @@ async function attachIntros(candidates, team) {
     .sort((a, b) => b.score - a.score);
 }
 
-export async function findTeammates({ me, needed, teammates = [], limit = 8 }) {
+export async function findTeammates({ me, needed, teammates = [], limit = 8, preferences = {} }) {
   const known = await skillRepository.listSkills();
   const canonical = new Map(known.map((s) => [s.name.toLowerCase(), s.name]));
   const lookup = (name) => canonical.get(name.trim().toLowerCase());
@@ -102,7 +118,7 @@ export async function findTeammates({ me, needed, teammates = [], limit = 8 }) {
 
   const rows = await matchRepository.findCandidates({ team, gap });
   const ranked = rows
-    .map((row) => rankCandidate(row, gap))
+    .map((row) => applyPreferences(rankCandidate(row, gap), preferences))
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);
 

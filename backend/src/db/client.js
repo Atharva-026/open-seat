@@ -24,3 +24,11 @@ export async function closeClient() {
     client = undefined;
   }
 }
+
+// One private graph per user, e.g. "user_atharva-026".
+export function userGraphName(githubLogin) {
+  if (!/^[A-Za-z0-9-]{1,39}$/.test(githubLogin)) throw new Error('Invalid GitHub login');
+  return `user_${githubLogin.toLowerCase()}`;
+}
+
+export const getUserGraph = (githubLogin) => getGraph(userGraphName(githubLogin));

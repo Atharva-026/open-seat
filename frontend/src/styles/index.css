@@ -75,3 +75,7 @@ button.button { border: 0; cursor: pointer; font: inherit; font-weight: 700; }
 .steps ol { margin: 10px 0 0; padding-left: 20px; }
 .steps li { margin-bottom: 8px; }
 .steps code { display: block; margin-top: 2px; font-size: 0.8rem; overflow-wrap: anywhere; }
+
+.memory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 8px; }
+.field select { display: block; margin-top: 6px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; }
+.memory-heading { margin: 20px 0 6px; font-size: 1rem; }

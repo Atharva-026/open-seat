@@ -1,6 +1,7 @@
 import { HttpError } from '../utils/httpError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { findTeammates, listAvailableSkills } from '../services/match.service.js';
+import { getPreferenceMap } from '../services/memory.service.js';
 
 const MAX_NEEDED = 10;
 const isStringList = (value) => Array.isArray(value) && value.every((v) => typeof v === 'string');
@@ -21,6 +22,12 @@ export const findMatches = asyncHandler(async (req, res) => {
   const safeLimit = Number.isInteger(limit) && limit > 0 && limit <= 20 ? limit : 8;
 
   res.json(
-    await findTeammates({ me: req.user.githubLogin, needed, teammates, limit: safeLimit })
+    await findTeammates({
+      me: req.user.githubLogin,
+      needed,
+      teammates,
+      limit: safeLimit,
+      preferences: await getPreferenceMap(req.user.githubLogin),
+    })
   );
 });

@@ -2,6 +2,7 @@ import * as skillRepository from '../../repositories/skill.repository.js';
 import * as personRepository from '../../repositories/person.repository.js';
 import { findTeammates } from '../../services/match.service.js';
 import { getProfile } from '../../services/profile.service.js';
+import * as memoryService from '../../services/memory.service.js';
 
 const isStringList = (v) => Array.isArray(v) && v.every((s) => typeof s === 'string');
 
@@ -58,7 +59,8 @@ const findTeammatesTool = {
       return { data: { error: '"needed" must be 1 to 10 skill names' }, summary: 'Rejected invalid skill list' };
     }
     const teammates = isStringList(args.teammates) ? args.teammates : [];
-    const result = await findTeammates({ me: ctx.me, needed: args.needed, teammates, limit: 6 });
+    const preferences = await memoryService.getPreferenceMap(ctx.me);
+    const result = await findTeammates({ me: ctx.me, needed: args.needed, teammates, limit: 6, preferences });
     ctx.lastMatch = result;
 
     const data = {
@@ -95,7 +97,33 @@ const getPastTeammates = {
   },
 };
 
-const tools = [listSkills, getMyProfile, findTeammatesTool, getPastTeammates];
+const rememberPreference = {
+  definition: {
+    type: 'function',
+    function: {
+      name: 'remember_preference',
+      description: 'Save a lasting preference the user just stated, so future searches use it. availability must be full-time, evenings or weekends. timezone looks like UTC+5:30.',
+      parameters: {
+        type: 'object',
+        properties: {
+          key: { type: 'string', enum: memoryService.PREFERENCE_KEYS },
+          value: { type: 'string' },
+        },
+        required: ['key', 'value'],
+      },
+    },
+  },
+  async run(args, ctx) {
+    try {
+      await memoryService.savePreference(ctx.me, args.key, args.value);
+      return { data: { saved: true }, summary: `Saved your preference: ${args.key} = ${args.value}` };
+    } catch (err) {
+      return { data: { error: err.message }, summary: `Could not save ${args.key}` };
+    }
+  },
+};
+
+const tools = [listSkills, getMyProfile, findTeammatesTool, getPastTeammates, rememberPreference];
 
 export const definitions = tools.map((t) => t.definition);
 const byName = new Map(tools.map((t) => [t.definition.function.name, t]));

@@ -1,8 +1,11 @@
 import { complete } from '../llm.client.js';
 import { definitions, executeTool } from '../tools/matcher.tools.js';
-import { MATCHER_SYSTEM_PROMPT } from './matcher.prompt.js';
+import { buildSystemPrompt } from './matcher.prompt.js';
+import { toPlainText } from '../../utils/plainText.js';
+import * as memoryService from '../../services/memory.service.js';
 
 const MAX_STEPS = 6;
+const RECOMMENDED_SHOWN = 3;
 
 function parseArgs(raw) {
   try {
@@ -13,24 +16,36 @@ function parseArgs(raw) {
 }
 
 export async function runMatcherAgent({ me, message }) {
+  const memory = await memoryService.listMemory(me);
   const messages = [
-    { role: 'system', content: MATCHER_SYSTEM_PROMPT },
+    { role: 'system', content: buildSystemPrompt(memory) },
     { role: 'user', content: message },
   ];
   const ctx = { me, lastMatch: null };
   const steps = [];
 
+  // Builds the response and writes this request to the user's episodic memory.
+  const finish = async (answer) => {
+    const match = ctx.lastMatch;
+    if (match) {
+      await memoryService.recordEpisode(me, {
+        question: message,
+        gap: match.gap,
+        recommended: match.candidates.slice(0, RECOMMENDED_SHOWN).map((c) => c.githubLogin),
+      });
+    }
+    return {
+      answer: toPlainText(answer),
+      steps,
+      gap: match?.gap ?? [],
+      candidates: match?.candidates ?? [],
+    };
+  };
+
   for (let i = 0; i < MAX_STEPS; i++) {
     const reply = await complete({ messages, tools: definitions });
 
-    if (!reply.tool_calls?.length) {
-      return {
-        answer: reply.content ?? '',
-        steps,
-        gap: ctx.lastMatch?.gap ?? [],
-        candidates: ctx.lastMatch?.candidates ?? [],
-      };
-    }
+    if (!reply.tool_calls?.length) return finish(reply.content ?? '');
 
     messages.push({ role: 'assistant', content: reply.content ?? '', tool_calls: reply.tool_calls });
 
@@ -42,10 +57,5 @@ export async function runMatcherAgent({ me, message }) {
     }
   }
 
-  return {
-    answer: 'I could not finish that request. Try asking for fewer things at once.',
-    steps,
-    gap: ctx.lastMatch?.gap ?? [],
-    candidates: ctx.lastMatch?.candidates ?? [],
-  };
+  return finish('I could not finish that request. Try asking for fewer things at once.');
 }

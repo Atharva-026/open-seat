@@ -7,11 +7,12 @@ import matchRoutes from './routes/match.routes.js';
 import profileRoutes from './routes/profile.routes.js';
 import teamRoutes from './routes/team.routes.js';
 import agentRoutes from './routes/agent.routes.js';
+import memoryRoutes from './routes/memory.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 export function createApp() {
   const app = express();
-  app.use(cors({ origin: env.frontendUrl, credentials: true }));
+  app.use(cors({ origin: env.frontendUrl, credentials: true, methods: ['GET', 'POST', 'PUT', 'DELETE'] }));
   app.use(express.json());
   app.use(cookieParser(env.sessionSecret));
 
@@ -21,6 +22,7 @@ export function createApp() {
   app.use('/api', matchRoutes);
   app.use('/api', teamRoutes);
   app.use('/api', agentRoutes);
+  app.use('/api', memoryRoutes);
 
   app.use(errorHandler);
   return app;
