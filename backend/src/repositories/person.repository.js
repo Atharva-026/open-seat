@@ -60,3 +60,15 @@ export async function findExisting(githubLogins) {
   );
   return res.data.map((row) => row.githubLogin);
 }
+
+export async function getPastTeammates(githubLogin) {
+  const graph = await getGraph();
+  const res = await graph.roQuery(
+    `MATCH (:Person {githubLogin: $githubLogin})-[t:TEAMED_WITH]-(o:Person)
+     RETURN o.githubLogin AS githubLogin, o.name AS name, o.isDemo AS isDemo,
+            avg(t.rating) AS rating, count(t) AS times
+     ORDER BY rating DESC LIMIT 20`,
+    { params: { githubLogin } }
+  );
+  return res.data;
+}

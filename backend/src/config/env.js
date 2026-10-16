@@ -18,6 +18,8 @@ export const env = {
     callbackUrl: process.env.GITHUB_CALLBACK_URL ?? 'http://localhost:3001/auth/github/callback',
   },
   groqApiKey: process.env.GROQ_API_KEY,
+  groqModel: process.env.GROQ_MODEL ?? 'openai/gpt-oss-120b',
+  groqFallbackModel: process.env.GROQ_FALLBACK_MODEL,
   sessionSecret: process.env.SESSION_SECRET,
 };
 

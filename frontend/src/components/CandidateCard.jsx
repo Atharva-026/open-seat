@@ -22,9 +22,11 @@ export default function CandidateCard({ candidate, added, canAdd, onToggle }) {
       <ul className="reasons">
         {reasons.map((reason) => <li key={reason}>{reason}</li>)}
       </ul>
-      <button type="button" className="chip" disabled={!added && !canAdd} onClick={() => onToggle(candidate)}>
-        {added ? 'Remove from team' : 'Add to team'}
-      </button>
+      {onToggle && (
+        <button type="button" className="chip" disabled={!added && !canAdd} onClick={() => onToggle(candidate)}>
+          {added ? 'Remove from team' : 'Add to team'}
+        </button>
+      )}
     </article>
   );
 }
