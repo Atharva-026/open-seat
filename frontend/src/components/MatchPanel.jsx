@@ -72,11 +72,11 @@ export default function MatchPanel({ teammates, onTeammatesChange, onTeamFormed 
           <input value={teamName} onChange={(e) => setTeamName(e.target.value)}
                  placeholder="Team name" maxLength={40} aria-label="Team name" />
           <button type="button" className="button" onClick={formTeam} disabled={formState === 'saving'}>
-            {formState === 'saving' ? 'Forming…' : 'Form team'}
+            {formState === 'saving' ? 'Sending…' : 'Send invitations'}
           </button>
         </div>
       )}
-      {formState === 'done' && <p className="muted">Team formed. Rate your teammates in "Your teams" below once the event ends.</p>}
+      {formState === 'done' && <p className="muted">Invitations sent. Replies appear under "Your teams".</p>}
       {formState === 'error' && <p className="muted">Could not form the team. Please try again.</p>}
 
       {status === 'done' && (

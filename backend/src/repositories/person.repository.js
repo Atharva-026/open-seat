@@ -32,7 +32,7 @@ export async function getProfile(githubLogin) {
   const res = await graph.roQuery(
     `MATCH (p:Person {githubLogin: $githubLogin})
      OPTIONAL MATCH (p)-[r:HAS_SKILL]->(s:Skill)
-     RETURN p.githubLogin AS githubLogin, p.name AS name, p.avatarUrl AS avatarUrl,
+     RETURN p.githubLogin AS githubLogin, p.name AS name, p.avatarUrl AS avatarUrl, p.isDemo AS isDemo,
             collect({name: s.name, category: s.category, level: r.level, evidence: r.evidence}) AS skills`,
     { params: { githubLogin } }
   );

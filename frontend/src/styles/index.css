@@ -79,3 +79,10 @@ button.button { border: 0; cursor: pointer; font: inherit; font-weight: 700; }
 .memory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 8px; }
 .field select { display: block; margin-top: 6px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; }
 .memory-heading { margin: 20px 0 6px; font-size: 1rem; }
+
+.status { display: inline-block; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: 0.8rem; text-transform: capitalize; }
+.status-confirmed, .status-accepted { border-color: #2fb67c; color: #2fb67c; }
+.status-declined, .status-closed { border-color: #f0647a; color: #f0647a; }
+.status-pending, .status-forming { border-color: var(--accent); color: var(--accent); }
+.invites { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+.invites li { display: flex; justify-content: space-between; align-items: center; gap: 12px; }

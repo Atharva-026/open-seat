@@ -14,13 +14,12 @@ export async function complete({ messages, tools }) {
 
   for (const model of modelsToTry()) {
     try {
-      const res = await getClient().chat.completions.create({
-        model,
-        messages,
-        tools,
-        tool_choice: 'auto',
-        temperature: 0.2,
-      });
+      const request = { model, messages, temperature: 0.2 };
+      if (tools?.length) {
+        request.tools = tools;
+        request.tool_choice = 'auto';
+      }
+      const res = await getClient().chat.completions.create(request);
       return res.choices[0].message;
     } catch (err) {
       lastError = err;
