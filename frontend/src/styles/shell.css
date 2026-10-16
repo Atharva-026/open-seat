@@ -1,0 +1,28 @@
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.3rem; letter-spacing: -0.04em; }
+
+.shell { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+.rail { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 32px; padding: 24px 18px; background: var(--surface); border-right: 1px solid var(--line); }
+.nav { display: grid; gap: 4px; }
+.nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; color: var(--muted); text-decoration: none; font-weight: 500; }
+.nav a:hover { color: var(--text); }
+.nav a[aria-current='page'] { color: var(--text); background: var(--raised); }
+.nav-seat { width: 18px; height: 18px; flex: none; }
+.nav-seat rect { fill: none; stroke: var(--muted); stroke-width: 2; stroke-dasharray: 3 3; transition: fill 0.2s; }
+.nav a[aria-current='page'] .nav-seat rect { fill: var(--amber); stroke: var(--amber); stroke-dasharray: none; }
+.nav-badge { margin-left: auto; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--amber); color: var(--amber-ink); font-size: 0.75rem; font-weight: 700; text-align: center; }
+.rail-user { margin-top: auto; display: grid; justify-items: start; gap: 6px; color: var(--muted); font-size: 0.9rem; }
+
+.stage { min-width: 0; display: flex; flex-direction: column; min-height: 100vh; }
+.page { width: 100%; max-width: 880px; margin: 0 auto; padding: 40px 28px 96px; display: grid; gap: 24px; align-content: start; }
+.me-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 24px; }
+
+@media (max-width: 800px) {
+  .shell { grid-template-columns: 1fr; }
+  .rail { position: fixed; inset: auto 0 0 0; height: auto; flex-direction: row; gap: 0; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--line); z-index: 20; }
+  .rail .logo, .rail-user { display: none; }
+  .nav { display: flex; width: 100%; justify-content: space-around; }
+  .nav a { flex-direction: column; gap: 4px; padding: 6px 10px; font-size: 0.75rem; }
+  .nav-badge { position: absolute; margin: -4px 0 0 18px; }
+  .stage { padding-bottom: 64px; }
+  .page { padding: 24px 16px 96px; }
+}

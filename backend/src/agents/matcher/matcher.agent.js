@@ -15,10 +15,11 @@ function parseArgs(raw) {
   }
 }
 
-export async function runMatcherAgent({ me, message }) {
+export async function runMatcherAgent({ me, message, history = [] }) {
   const memory = await memoryService.listMemory(me);
   const messages = [
     { role: 'system', content: buildSystemPrompt(memory) },
+    ...history,
     { role: 'user', content: message },
   ];
   const ctx = { me, lastMatch: null };

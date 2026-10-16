@@ -1,0 +1,20 @@
+:root {
+  color-scheme: dark;
+  --night: #0a0f24;
+  --surface: #101735;
+  --raised: #182046;
+  --line: #28335f;
+  --text: #f0f2ff;
+  --muted: #a3acd0;
+  --amber: #ffb81f;
+  --amber-ink: #1a1203;
+  --good: #2fb67c;
+  --bad: #f0647a;
+  --font: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* names used by the logo and older components */
+  --bg: var(--night);
+  --panel: var(--surface);
+  --ink: var(--text);
+  --accent: var(--amber);
+}

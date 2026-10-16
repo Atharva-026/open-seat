@@ -1,0 +1,28 @@
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { min-height: 100%; }
+body { margin: 0; background: var(--night); color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.55; }
+h1, h2, h3 { margin: 0; letter-spacing: -0.02em; line-height: 1.15; }
+h1 { font-size: 1.9rem; }
+p { margin: 0; }
+a { color: var(--amber); }
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+.muted { color: var(--muted); }
+.boot { display: grid; place-items: center; min-height: 100vh; color: var(--muted); }
+
+.button { display: inline-block; padding: 10px 18px; border: 0; border-radius: 10px; background: var(--amber); color: var(--amber-ink); font-weight: 700; text-decoration: none; cursor: pointer; }
+.button:disabled { opacity: 0.4; cursor: not-allowed; }
+.link-btn { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; cursor: pointer; }
+.link-btn:hover { color: var(--text); }
+.chip { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; cursor: pointer; }
+.chip:disabled { opacity: 0.4; cursor: not-allowed; }
+.chip-on { background: var(--amber); border-color: var(--amber); color: var(--amber-ink); font-weight: 700; }
+
+input, select, textarea { background: var(--night); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+input::placeholder, textarea::placeholder { color: var(--muted); }
+
+.landing { max-width: 640px; margin: 0 auto; padding: 12vh 24px; display: grid; gap: 24px; justify-items: start; }
+.landing h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); }
+.landing p { color: var(--muted); font-size: 1.1rem; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

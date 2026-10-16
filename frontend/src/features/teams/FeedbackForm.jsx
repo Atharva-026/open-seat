@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { submitFeedback } from '../api/teams.api.js';
+import { submitFeedback } from '../../api/teams.api.js';
 
 export default function FeedbackForm({ team, me }) {
   const mates = team.members.filter((m) => m.githubLogin !== me);

@@ -41,7 +41,7 @@ export default function TeamsPanel({ teams, me, onUseTeam }) {
               {mates.length > 0 && (
                 <button type="button" className="chip"
                         onClick={() => onUseTeam(mates.map((m) => m.githubLogin))}>
-                  Use as my team in search
+                  Find more teammates
                 </button>
               )}
               {confirmed && mates.length > 0 && (

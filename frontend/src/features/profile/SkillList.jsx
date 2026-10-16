@@ -1,4 +1,4 @@
-import { categoryColor } from '../lib/categoryColors.js';
+import { categoryColor } from '../../lib/categoryColors.js';
 
 export default function SkillList({ skills }) {
   const byCategory = skills.reduce((groups, skill) => {

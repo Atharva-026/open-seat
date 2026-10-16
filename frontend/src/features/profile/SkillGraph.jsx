@@ -1,4 +1,4 @@
-import { categoryColor } from '../lib/categoryColors.js';
+import { categoryColor } from '../../lib/categoryColors.js';
 
 const SIZE = 640;
 const CENTER = SIZE / 2;
