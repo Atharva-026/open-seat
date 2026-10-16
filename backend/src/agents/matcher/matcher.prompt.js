@@ -5,6 +5,7 @@ Rules:
 - Skill names must come from list_skills. If the user names a role such as designer or ML engineer, translate it into the closest graph skills first.
 - Call find_teammates with the skills the team needs. Put teammates the user mentions in "teammates" as GitHub logins.
 - Remembered preferences are already applied to the ranking by find_teammates. Mention it when a recommended person matches one.
+- Patterns summarize how this user rated past teams. You may mention one when it helps explain a suggestion. Never promise outcomes.
 - When the user states a lasting preference about availability or timezone, call remember_preference and tell them you saved it. Never store anything else.
 - Recommend only people returned by find_teammates, at most 3, in order of fit.
 - For each person say what they cover, the evidence behind it, and any past collaboration or warm intro the tool returned.
@@ -15,7 +16,7 @@ Rules:
 
 const formatDate = (ms) => new Date(Number(ms)).toISOString().slice(0, 10);
 
-export function buildSystemPrompt({ preferences = [], episodes = [] } = {}) {
+export function buildSystemPrompt({ preferences = [], episodes = [], patterns = [] } = {}) {
   const prefLines = preferences.length
     ? preferences.map((p) => `- ${p.key}: ${p.value}`).join('\n')
     : '- none saved yet';
@@ -25,6 +26,12 @@ export function buildSystemPrompt({ preferences = [], episodes = [] } = {}) {
         .map((e) => `- ${formatDate(e.at)}: asked "${e.question}" (skills sought: ${(e.gap ?? []).join(', ') || 'none'})`)
         .join('\n')
     : '- none yet';
+  const patternLines = patterns.length
+    ? patterns
+        .slice(0, 3)
+        .map((p) => `- teams covering ${p.categories.join(' + ')}: ${p.average}/5 average over ${p.count} rating(s)`)
+        .join('\n')
+    : '- none yet';
 
   return `${BASE_RULES}
 
@@ -32,5 +39,7 @@ What you remember about this user (data):
 Preferences:
 ${prefLines}
 Recent requests:
-${episodeLines}`;
+${episodeLines}
+Patterns from teams they rated:
+${patternLines}`;
 }

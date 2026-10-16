@@ -4,6 +4,7 @@ import * as personRepository from '../repositories/person.repository.js';
 import * as teamRepository from '../repositories/team.repository.js';
 import { getProfile } from './profile.service.js';
 import { sendInvites } from './outreach.service.js';
+import { bus, EVENTS } from '../agents/events.js';
 
 const HACKATHON = { id: 'graph-hacks-2026', name: 'Graph Hacks 2026' };
 const MAX_TEAM_SIZE = 4;
@@ -55,6 +56,12 @@ export async function submitFeedback({ me, teamId, entries }) {
   if (!ratesOnlyTeammates) throw new HttpError(400, 'You can only rate your teammates');
 
   await teamRepository.saveFeedback({ from: me, hackathonId: team.hackathonId, entries });
+  bus.emit(EVENTS.feedbackSubmitted, {
+    me,
+    teamId,
+    members: team.members,
+    ratings: entries.map((e) => e.rating),
+  });
 }
 
 export const listInbox = (me) => teamRepository.getInbox(me);

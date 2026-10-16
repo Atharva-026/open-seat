@@ -63,6 +63,19 @@ export default function MemoryPanel({ memory, onSave, onForget, onForgetAll }) {
           </ul>
         )}
 
+      <h3 className="memory-heading">What worked for you</h3>
+      {memory.patterns?.length > 0
+        ? (
+          <ul className="reasons">
+            {memory.patterns.map((p) => (
+              <li key={p.key}>
+                Teams covering {p.categories.join(' + ')}: {p.average}/5 over {p.count} rating(s)
+              </li>
+            ))}
+          </ul>
+        )
+        : <p className="muted">Rate a confirmed team and Open Seat learns which skill mixes work for you.</p>}
+
       <button type="button" className="chip" onClick={confirmForgetAll}>Forget everything</button>
     </section>
   );

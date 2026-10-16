@@ -49,3 +49,44 @@ export async function deleteEverything(githubLogin) {
   const graph = await getUserGraph(githubLogin);
   await graph.query('MATCH (n) DETACH DELETE n');
 }
+
+export async function addTeamHistory(githubLogin, { teamId, name, members }) {
+  const graph = await getUserGraph(githubLogin);
+  await graph.query(
+    'MERGE (h:TeamHistory {teamId: $teamId}) SET h.name = $name, h.members = $members, h.at = $now',
+    { params: { teamId, name, members, now: Date.now() } }
+  );
+}
+
+// Returns true if this team was already counted, then marks it as counted.
+export async function markTeamRated(githubLogin, teamId) {
+  const graph = await getUserGraph(githubLogin);
+  const res = await graph.query(
+    `MERGE (h:TeamHistory {teamId: $teamId})
+     WITH h, coalesce(h.rated, false) AS was
+     SET h.rated = true
+     RETURN was`,
+    { params: { teamId } }
+  );
+  return res.data?.[0]?.was === true;
+}
+
+export async function upsertPattern(githubLogin, { key, categories, ratingSum, n }) {
+  const graph = await getUserGraph(githubLogin);
+  await graph.query(
+    `MERGE (p:Pattern {key: $key})
+     ON CREATE SET p.categories = $categories, p.ratingSum = $ratingSum, p.count = $n, p.updatedAt = $now
+     ON MATCH SET p.ratingSum = p.ratingSum + $ratingSum, p.count = p.count + $n, p.updatedAt = $now`,
+    { params: { key, categories, ratingSum, n, now: Date.now() } }
+  );
+}
+
+export async function getPatterns(githubLogin, limit) {
+  const graph = await getUserGraph(githubLogin);
+  const res = await graph.query(
+    `MATCH (p:Pattern)
+     RETURN p.key AS key, p.categories AS categories, p.ratingSum AS ratingSum, p.count AS count
+     ORDER BY p.ratingSum / p.count DESC LIMIT ${Number(limit)}`
+  );
+  return res.data ?? [];
+}

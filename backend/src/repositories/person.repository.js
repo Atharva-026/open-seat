@@ -72,3 +72,14 @@ export async function getPastTeammates(githubLogin) {
   );
   return res.data;
 }
+
+export async function findRealUsers(githubLogins) {
+  const graph = await getGraph();
+  const res = await graph.roQuery(
+    `MATCH (p:Person)
+     WHERE p.githubLogin IN $githubLogins AND coalesce(p.isDemo, false) = false
+     RETURN p.githubLogin AS githubLogin`,
+    { params: { githubLogins } }
+  );
+  return res.data.map((row) => row.githubLogin);
+}

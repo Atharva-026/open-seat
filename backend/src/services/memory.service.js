@@ -4,6 +4,7 @@ import * as memoryRepository from '../repositories/memory.repository.js';
 
 const EPISODES_KEPT = 20;
 const EPISODES_SHOWN = 5;
+const PATTERNS_SHOWN = 5;
 
 const VALIDATORS = {
   availability: (v) => ['full-time', 'evenings', 'weekends'].includes(v),
@@ -27,11 +28,21 @@ export async function forgetPreference(me, key) {
 export const forgetEverything = (me) => memoryRepository.deleteEverything(me);
 
 export async function listMemory(me) {
-  const [preferences, episodes] = await Promise.all([
+  const [preferences, episodes, patterns] = await Promise.all([
     memoryRepository.getPreferences(me),
     memoryRepository.getRecentEpisodes(me, EPISODES_SHOWN),
+    memoryRepository.getPatterns(me, PATTERNS_SHOWN),
   ]);
-  return { preferences, episodes };
+  return {
+    preferences,
+    episodes,
+    patterns: patterns.map((p) => ({
+      key: p.key,
+      categories: p.categories,
+      count: p.count,
+      average: Math.round((p.ratingSum / p.count) * 10) / 10,
+    })),
+  };
 }
 
 export async function getPreferenceMap(me) {
@@ -45,3 +56,16 @@ export const recordEpisode = (me, { question, gap, recommended }) =>
     { id: crypto.randomUUID(), question, gap, recommended },
     EPISODES_KEPT
   );
+
+export const recordTeamHistory = (me, team) => memoryRepository.addTeamHistory(me, team);
+
+export const markTeamRated = (me, teamId) => memoryRepository.markTeamRated(me, teamId);
+
+export function recordPattern(me, { categories, ratings }) {
+  return memoryRepository.upsertPattern(me, {
+    key: categories.join('+'),
+    categories,
+    ratingSum: ratings.reduce((sum, r) => sum + r, 0),
+    n: ratings.length,
+  });
+}

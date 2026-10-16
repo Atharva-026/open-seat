@@ -159,3 +159,15 @@ export async function saveFeedback({ from, hackathonId, entries }) {
     { params: { from, hackathonId, entries } }
   );
 }
+
+// Skill categories a team covers at a solid level (3 or higher).
+export async function getTeamCategories(members) {
+  const graph = await getGraph();
+  const res = await graph.roQuery(
+    `MATCH (p:Person)-[r:HAS_SKILL]->(s:Skill)
+     WHERE p.githubLogin IN $members AND r.level >= 3
+     RETURN DISTINCT s.category AS category`,
+    { params: { members } }
+  );
+  return res.data.map((row) => row.category).filter(Boolean);
+}
