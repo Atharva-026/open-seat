@@ -69,7 +69,7 @@ export default function MemoryPanel({ memory, onSave, onForget, onForgetAll }) {
           <ul className="reasons">
             {memory.patterns.map((p) => (
               <li key={p.key}>
-                Teams covering {p.categories.join(' + ')}: {p.average}/5 over {p.count} rating(s)
+                Teammates who add {p.categories.join(', ')}: {p.average}/5 over {p.count} rating(s)
               </li>
             ))}
           </ul>

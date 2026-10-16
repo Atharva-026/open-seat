@@ -5,12 +5,12 @@ export async function createTeam({ id, name, createdBy, hackathonId, hackathonNa
   await graph.query(
     `MERGE (h:Hackathon {id: $hackathonId})
      SET h.name = $hackathonName
-     CREATE (t:Team {id: $id, name: $name, status: 'forming', outcome: 'in progress', createdBy: $createdBy, isDemo: false})
+     CREATE (t:Team {id: $id, name: $name, status: 'forming', outcome: 'in progress', createdBy: $createdBy, isDemo: false, createdAt: $now})
      CREATE (t)-[:ENTERED]->(h)
      WITH t
      MATCH (p:Person {githubLogin: $createdBy})
      CREATE (p)-[:MEMBER_OF]->(t)`,
-    { params: { id, name, createdBy, hackathonId, hackathonName } }
+    { params: { id, name, createdBy, hackathonId, hackathonName, now: Date.now() } }
   );
 }
 
@@ -21,7 +21,9 @@ export async function getTeams(githubLogin) {
      MATCH (m:Person)-[:MEMBER_OF]->(t)
      OPTIONAL MATCH (t)-[:ENTERED]->(h:Hackathon)
      RETURN t.id AS id, t.name AS name, coalesce(t.status, 'confirmed') AS status, h.name AS hackathon,
-            collect({githubLogin: m.githubLogin, name: m.name, isDemo: m.isDemo}) AS members`,
+            collect({githubLogin: m.githubLogin, name: m.name, isDemo: m.isDemo}) AS members,
+            coalesce(t.createdAt, 0) AS createdAt
+     ORDER BY createdAt DESC`,
     { params: { githubLogin } }
   );
   return res.data;

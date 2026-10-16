@@ -41,13 +41,14 @@ export async function getProfile(githubLogin) {
   return { ...row, skills: row.skills.filter((s) => s.name) };
 }
 
-export async function getSkillNames(githubLogins) {
+// A skill counts as covered only at level 3 or higher.
+export async function getSkillNames(githubLogins, minLevel = 3) {
   const graph = await getGraph();
   const res = await graph.roQuery(
-    `MATCH (p:Person)-[:HAS_SKILL]->(s:Skill)
-     WHERE p.githubLogin IN $githubLogins
+    `MATCH (p:Person)-[r:HAS_SKILL]->(s:Skill)
+     WHERE p.githubLogin IN $githubLogins AND r.level >= $minLevel
      RETURN DISTINCT s.name AS name`,
-    { params: { githubLogins } }
+    { params: { githubLogins, minLevel } }
   );
   return res.data.map((row) => row.name);
 }

@@ -32,17 +32,22 @@ async function onFeedback({ me, teamId, members, ratings }) {
     return;
   }
 
-  const categories = (await teamRepository.getTeamCategories(members))
-    .filter((category) => !IGNORED_CATEGORIES.has(category))
+  const mine = new Set(await teamRepository.getTeamCategories([me]));
+  const teammates = members.filter((login) => login !== me);
+  const added = (await teamRepository.getTeamCategories(teammates))
+    .filter((category) => !IGNORED_CATEGORIES.has(category) && !mine.has(category))
     .sort();
-  if (!categories.length || !ratings.length) return;
+  if (!added.length || !ratings.length) {
+    await log(teamId, 'no new pattern', 'Your teammates did not add a skill area you lack, so there was nothing new to learn.');
+    return;
+  }
 
-  await memoryService.recordPattern(me, { categories, ratings });
+  await memoryService.recordPattern(me, { categories: added, ratings });
   const average = (ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1);
   await log(
     teamId,
     'learned a pattern',
-    `Teams covering ${categories.join(' + ')} got an average of ${average}/5 from you. Saved to your private memory.`
+    `Teammates who added ${added.join(', ')} got an average of ${average}/5 from you. Saved to your private memory.`
   );
 }
 

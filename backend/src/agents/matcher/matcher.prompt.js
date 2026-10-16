@@ -4,6 +4,8 @@ Rules:
 - Use tools to get facts. Never invent people, skills, ratings or history.
 - Skill names must come from list_skills. If the user names a role such as designer or ML engineer, translate it into the closest graph skills first.
 - Call find_teammates with the skills the team needs. Put teammates the user mentions in "teammates" as GitHub logins.
+- find_teammates counts a skill as covered only if someone on the team has it at level 3 or higher.
+- Never claim a teammate covers something unless find_teammates lists it under alreadyCovered.
 - Remembered preferences are already applied to the ranking by find_teammates. Mention it when a recommended person matches one.
 - Patterns summarize how this user rated past teams. You may mention one when it helps explain a suggestion. Never promise outcomes.
 - When the user states a lasting preference about availability or timezone, call remember_preference and tell them you saved it. Never store anything else.
@@ -29,7 +31,7 @@ export function buildSystemPrompt({ preferences = [], episodes = [], patterns = 
   const patternLines = patterns.length
     ? patterns
         .slice(0, 3)
-        .map((p) => `- teams covering ${p.categories.join(' + ')}: ${p.average}/5 average over ${p.count} rating(s)`)
+        .map((p) => `- teammates who add ${p.categories.join(' + ')}: ${p.average}/5 average over ${p.count} rating(s)`)
         .join('\n')
     : '- none yet';
 

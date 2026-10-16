@@ -61,11 +61,17 @@ export const recordTeamHistory = (me, team) => memoryRepository.addTeamHistory(m
 
 export const markTeamRated = (me, teamId) => memoryRepository.markTeamRated(me, teamId);
 
-export function recordPattern(me, { categories, ratings }) {
-  return memoryRepository.upsertPattern(me, {
-    key: categories.join('+'),
-    categories,
-    ratingSum: ratings.reduce((sum, r) => sum + r, 0),
-    n: ratings.length,
-  });
+// One pattern per skill area a teammate added, so patterns add up across teams.
+export async function recordPattern(me, { categories, ratings }) {
+  const ratingSum = ratings.reduce((sum, r) => sum + r, 0);
+  await Promise.all(
+    categories.map((category) =>
+      memoryRepository.upsertPattern(me, {
+        key: `adds:${category}`,
+        categories: [category],
+        ratingSum,
+        n: ratings.length,
+      })
+    )
+  );
 }
