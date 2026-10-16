@@ -10,6 +10,7 @@ export function buildAuthorizeUrl(state) {
     redirect_uri: env.github.callbackUrl,
     scope: 'read:user',
     state,
+    prompt: 'select_account',
   });
   return `${OAUTH}/authorize?${params}`;
 }
