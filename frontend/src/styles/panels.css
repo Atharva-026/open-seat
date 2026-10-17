@@ -1,43 +1,43 @@
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
-.card h2 { font-size: 1.25rem; margin-bottom: 14px; }
-.candidate { padding: 16px 0; border-top: 1px solid var(--line); }
-.candidate h3 { display: inline; margin-right: 8px; font-size: 1.05rem; }
+.card { padding: 24px; border: 1px solid var(--line); border-radius: 14px; }
+.card h2 { margin-bottom: 14px; font-size: 1.15rem; font-weight: 600; letter-spacing: -0.02em; }
+.candidate { padding: 18px 0; border-top: 1px solid var(--line); }
+.candidate h3 { display: inline; margin-right: 8px; font-size: 1.05rem; font-weight: 600; }
 .candidate p { margin: 6px 0; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.badge { margin-left: 8px; padding: 2px 8px; border-radius: 999px; border: 1px dashed var(--muted); color: var(--muted); font-size: 0.75rem; }
-.status { display: inline-block; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: 0.8rem; text-transform: capitalize; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.badge { margin-left: 8px; padding: 1px 8px; border: 1px dashed var(--dim); border-radius: 999px; color: var(--dim); font-size: 0.72rem; }
+.status { display: inline-block; padding: 1px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 0.78rem; text-transform: capitalize; }
 .status-confirmed, .status-accepted { border-color: var(--good); color: var(--good); }
 .status-declined, .status-closed { border-color: var(--bad); color: var(--bad); }
-.status-pending, .status-forming { border-color: var(--amber); color: var(--amber); }
-.invites { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
-.invites li { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.reasons { margin: 10px 0 0; padding-left: 18px; color: var(--muted); font-size: 0.92rem; }
-.steps { margin: 12px 0; color: var(--muted); font-size: 0.9rem; }
+.status-pending, .status-forming { border-color: var(--seat); color: var(--seat); }
+.invites { display: grid; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+.invites li { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.reasons { margin: 10px 0 0; padding-left: 18px; color: var(--dim); font-size: 0.92rem; }
+.steps { margin: 12px 0; color: var(--dim); font-size: 0.9rem; }
 .steps summary { cursor: pointer; }
 .steps ol { margin: 10px 0 0; padding-left: 20px; }
 .steps li { margin-bottom: 8px; }
-.steps code { display: block; margin-top: 2px; font-size: 0.8rem; overflow-wrap: anywhere; }
-.evidence { display: block; color: var(--muted); font-size: 0.85rem; }
+.steps code { display: block; margin-top: 2px; font-family: var(--mono); font-size: 0.75rem; overflow-wrap: anywhere; }
+.evidence { display: block; color: var(--dim); font-size: 0.85rem; }
 .feedback { display: grid; gap: 10px; margin-top: 14px; }
 .feedback-row { display: grid; grid-template-columns: 90px 90px 1fr; gap: 8px; align-items: center; }
 .feedback input { width: 100%; }
 .memory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-.memory-heading { margin: 22px 0 6px; font-size: 1rem; }
-.field { display: block; color: var(--muted); font-size: 0.9rem; }
+.memory-heading { margin: 22px 0 6px; font-size: 1rem; font-weight: 600; }
+.field { display: block; color: var(--dim); font-size: 0.9rem; }
 .field select, .field input { display: block; margin-top: 6px; }
 .ask { display: flex; gap: 10px; margin-top: 6px; }
 .ask input { flex: 1; min-width: 0; }
 
 .graph { width: 100%; height: auto; }
 .edge { stroke: var(--line); stroke-width: 1.5; }
-.person-ring { fill: var(--surface); stroke: var(--amber); stroke-width: 3; }
-.node-label { fill: var(--text); font-size: 13px; }
-.skill-list h3 { display: flex; align-items: center; gap: 8px; text-transform: capitalize; font-size: 1rem; margin: 18px 0 6px; }
+.person-ring { fill: var(--ink); stroke: var(--seat); stroke-width: 2; }
+.node-label { fill: var(--paper); font-size: 13px; }
+.skill-list h3 { display: flex; align-items: center; gap: 8px; margin: 18px 0 6px; font-size: 1rem; text-transform: capitalize; }
 .skill-list h3:first-child { margin-top: 0; }
-.skill-list ul { list-style: none; margin: 0; padding: 0; }
+.skill-list ul { margin: 0; padding: 0; list-style: none; }
 .skill-list li { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 4px 0; }
 .skill-list .evidence { flex-basis: 100%; }
 .swatch { width: 10px; height: 10px; border-radius: 3px; }
-.level { color: var(--muted); font-size: 0.85rem; }
+.level { color: var(--dim); font-size: 0.85rem; }
 
 @media (max-width: 560px) { .feedback-row { grid-template-columns: 1fr; } }

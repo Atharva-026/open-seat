@@ -5,7 +5,7 @@ export default function CandidateRow({ candidate, added, canAdd, onToggle }) {
 
   return (
     <li className="cand">
-      <span className="cand-seat" aria-hidden="true">{name.slice(0, 1)}</span>
+      <span className={`cand-seat ${added ? 'cand-seat-on' : ''}`} aria-hidden="true">{name.slice(0, 1)}</span>
       <div className="cand-main">
         <div className="cand-head">
           <strong>{name}</strong>

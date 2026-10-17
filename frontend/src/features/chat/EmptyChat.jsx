@@ -1,8 +1,4 @@
-const PROMPTS = [
-  'I need a designer and someone who knows computer vision',
-  'I have a React developer. We need a backend person and someone to pitch',
-  'Who from my past teams should I work with again?',
-];
+import { EXAMPLE_PROMPTS } from './prompts.js';
 
 export default function EmptyChat({ name, onPick }) {
   const first = name.split(' ')[0];
@@ -15,7 +11,7 @@ export default function EmptyChat({ name, onPick }) {
         teams, and I show you how I found each person.
       </p>
       <ul className="prompts">
-        {PROMPTS.map((prompt) => (
+        {EXAMPLE_PROMPTS.map((prompt) => (
           <li key={prompt}>
             <button type="button" onClick={() => onPick(prompt)}>{prompt}</button>
           </li>

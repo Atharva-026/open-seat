@@ -11,7 +11,7 @@ export default function TeamsPage() {
 
   return (
     <div className="page">
-      <h1>Teams</h1>
+      <header className="page-head"><h1>Teams</h1></header>
       <InboxPanel invites={invites} onRespond={respondToInvite} />
       <TeamsPanel teams={teams} me={profile.githubLogin} onUseTeam={findMore} />
       {!teams.length && !invites.length && (

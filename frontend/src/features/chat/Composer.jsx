@@ -1,7 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+const MAX_HEIGHT = 168;
 
 export default function Composer({ onSend, disabled, initialText = '' }) {
   const [text, setText] = useState(initialText);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, MAX_HEIGHT)}px`;
+  }, [text]);
+
+  useEffect(() => {
+    if (!disabled) ref.current?.focus();
+  }, [disabled]);
 
   const submit = (event) => {
     event.preventDefault();
@@ -17,7 +31,7 @@ export default function Composer({ onSend, disabled, initialText = '' }) {
 
   return (
     <form className="composer" onSubmit={submit}>
-      <textarea rows={2} value={text} maxLength={500} placeholder="Describe who you need"
+      <textarea ref={ref} rows={1} value={text} maxLength={500} placeholder="Describe who you need"
                 aria-label="Message Open Seat"
                 onChange={(e) => setText(e.target.value)} onKeyDown={onKeyDown} />
       <button type="submit" className="button" disabled={!text.trim() || disabled}>Send</button>

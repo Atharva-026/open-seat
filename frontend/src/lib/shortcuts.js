@@ -1,0 +1,1 @@
+export const PALETTE_KEY = /Mac|iPhone|iPad/i.test(navigator.userAgent) ? '⌘K' : 'Ctrl K';

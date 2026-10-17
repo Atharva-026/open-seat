@@ -1,9 +1,12 @@
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext.jsx';
 import { useTeams } from '../hooks/useTeams.js';
 import { useInbox } from '../hooks/useInbox.js';
 import { useProposal } from '../hooks/useProposal.js';
 import { useChat } from '../features/chat/useChat.js';
+import { EXAMPLE_PROMPTS } from '../features/chat/prompts.js';
+import CommandPalette from './CommandPalette.jsx';
 import Logo from '../components/Logo.jsx';
 
 function NavItem({ to, label, badge = 0 }) {
@@ -21,13 +24,43 @@ function NavItem({ to, label, badge = 0 }) {
 
 export default function AppShell() {
   const { profile, signOut } = useAuth();
+  const navigate = useNavigate();
   const { teams, refresh: refreshTeams } = useTeams();
   const { invites, respond } = useInbox(refreshTeams);
   const proposal = useProposal(refreshTeams);
   const chat = useChat();
+  const [paletteOpen, setPaletteOpen] = useState(false);
 
-  // Shared by all pages through the router outlet.
-  const shared = { profile, chat, proposal, teams, invites, respondToInvite: respond };
+  const openPalette = useCallback(() => setPaletteOpen(true), []);
+  const closePalette = useCallback(() => setPaletteOpen(false), []);
+
+  useEffect(() => {
+    const onKey = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setPaletteOpen((open) => !open);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const { reset, send } = chat;
+  const actions = useMemo(() => [
+    { id: 'find', label: 'Find teammates', run: () => navigate('/app/find') },
+    { id: 'teams', label: 'Teams and invitations', run: () => navigate('/app/teams') },
+    { id: 'me', label: 'My profile and memory', run: () => navigate('/app/me') },
+    { id: 'new', label: 'Start a new chat', run: () => { reset(); navigate('/app/find'); } },
+    { id: 'home', label: 'Go to the home page', run: () => navigate('/') },
+    ...EXAMPLE_PROMPTS.map((prompt) => ({
+      id: prompt,
+      label: `Ask: ${prompt}`,
+      run: () => { navigate('/app/find'); send(prompt); },
+    })),
+    { id: 'out', label: 'Sign out', run: signOut },
+  ], [navigate, reset, send, signOut]);
+
+  const shared = { profile, chat, proposal, teams, invites, respondToInvite: respond, openPalette };
 
   return (
     <div className="shell">
@@ -48,6 +81,7 @@ export default function AppShell() {
       <main className="stage">
         <Outlet context={shared} />
       </main>
+      <CommandPalette open={paletteOpen} onClose={closePalette} actions={actions} />
     </div>
   );
 }

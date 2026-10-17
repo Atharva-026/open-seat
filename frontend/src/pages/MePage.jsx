@@ -10,7 +10,7 @@ export default function MePage() {
 
   return (
     <div className="page">
-      <h1>{profile.name}</h1>
+      <header className="page-head"><h1>{profile.name}</h1></header>
       <div className="me-grid">
         <section className="card"><SkillGraph profile={profile} /></section>
         <section className="card"><SkillList skills={profile.skills} /></section>

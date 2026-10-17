@@ -9,13 +9,14 @@ export function useChat() {
   const [messages, setMessages] = useState([]);
   const [pending, setPending] = useState(false);
 
-  const send = useCallback(async (text) => {
-    const history = messages
+  // `base` is the conversation before this question.
+  const run = useCallback(async (text, base) => {
+    const history = base
       .filter((m) => !m.failed)
       .slice(-HISTORY_SENT)
       .map((m) => ({ role: m.role, content: m.text }));
 
-    setMessages((cur) => [...cur, { id: newId(), role: 'user', text }]);
+    setMessages([...base, { id: newId(), role: 'user', text }]);
     setPending(true);
     try {
       const result = await askMatcher(text, history);
@@ -24,22 +25,31 @@ export function useChat() {
         { id: newId(), role: 'assistant', text: result.answer, steps: result.steps, candidates: result.candidates },
       ]);
     } catch (err) {
-      const busy = err.status === 429;
       setMessages((cur) => [
         ...cur,
         {
           id: newId(),
           role: 'assistant',
           failed: true,
-          text: busy
-            ? 'The AI service is busy. Send your message again in a moment.'
-            : 'Something went wrong on my side. Send your message again.',
+          text: err.status === 429
+            ? 'The AI service is busy right now.'
+            : 'Something went wrong on my side.',
         },
       ]);
     } finally {
       setPending(false);
     }
-  }, [messages]);
+  }, []);
 
-  return { messages, pending, send };
+  const send = useCallback((text) => run(text, messages), [run, messages]);
+
+  const retry = useCallback(() => {
+    const lastUser = [...messages].reverse().find((m) => m.role === 'user');
+    if (!lastUser) return;
+    run(lastUser.text, messages.slice(0, messages.lastIndexOf(lastUser)));
+  }, [messages, run]);
+
+  const reset = useCallback(() => setMessages([]), []);
+
+  return { messages, pending, send, retry, reset };
 }
