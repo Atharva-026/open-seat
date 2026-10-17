@@ -40,8 +40,8 @@ FalkorDB holds all state, and the agents share it.
 - `(Person)-[:HAS_SKILL {level, evidence}]->(Skill)`
 - `(Person)-[:MEMBER_OF]->(Team)`
 - `(Team)-[:ENTERED]->(Hackathon)`
-- `(Team)-[:INVITED {id, status, message, at, simulated}]->(Person)`
-- `(Person)-[:TEAMED_WITH {rating, note, hackathon}]->(Person)`
+- `(Team)-[:INVITED {id, status, message, at, simulated, forSkills}]->(Person)`
+- `(Person)-[:TEAMED_WITH {rating, note, delivered, hackathon}]->(Person)`
 - `(Team)-[:HAS_EVENT]->(AgentEvent)`
 
 **Private graph `user_<githubLogin>`**
@@ -128,6 +128,7 @@ frontend/src/
 - Demo personas reply automatically, so invitation flows with real people need a second signed-in account.
 - The Groq free tier is rate limited; the app falls back to a second model.
 - Agents hand off through an in-process event bus, so run a single server instance.
+- Skill evidence comes from profile repositories, not commit statistics.
 - [Add anything else that is honest, for example features you did not finish.]
 
 ## How AI tools were used
