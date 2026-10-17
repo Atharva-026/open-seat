@@ -8,12 +8,22 @@ const isValidEntry = (e) =>
   (e.note === undefined || (typeof e.note === 'string' && e.note.length <= 140));
 
 export const createTeam = asyncHandler(async (req, res) => {
-  const { name, members } = req.body ?? {};
+  const { name, members, size } = req.body ?? {};
   if (!isStringList(members)) throw new HttpError(400, '"members" must be a list of GitHub logins');
   if (name !== undefined && (typeof name !== 'string' || name.length > 40)) {
     throw new HttpError(400, '"name" must be a string up to 40 characters');
   }
-  res.status(201).json(await teamService.formTeam({ me: req.user.githubLogin, name, members }));
+  if (size !== undefined && !Number.isInteger(size)) throw new HttpError(400, '"size" must be a whole number');
+  res.status(201).json(await teamService.formTeam({ me: req.user.githubLogin, name, members, size }));
+});
+
+export const invitePeople = asyncHandler(async (req, res) => {
+  const { members } = req.body ?? {};
+  if (!isStringList(members) || !members.length) {
+    throw new HttpError(400, '"members" must be a list of GitHub logins');
+  }
+  await teamService.inviteMore({ me: req.user.githubLogin, teamId: req.params.id, logins: members });
+  res.status(204).end();
 });
 
 export const listTeams = asyncHandler(async (req, res) => {

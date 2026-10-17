@@ -3,8 +3,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext.jsx';
 import { useTeams } from '../hooks/useTeams.js';
 import { useInbox } from '../hooks/useInbox.js';
-import { useProposal } from '../hooks/useProposal.js';
-import { useChat } from '../features/chat/useChat.js';
+import { useConversation } from '../features/chat/useConversation.js';
 import { EXAMPLE_PROMPTS } from '../features/chat/prompts.js';
 import CommandPalette from './CommandPalette.jsx';
 import Logo from '../components/Logo.jsx';
@@ -27,8 +26,7 @@ export default function AppShell() {
   const navigate = useNavigate();
   const { teams, refresh: refreshTeams } = useTeams();
   const { invites, respond } = useInbox(refreshTeams);
-  const proposal = useProposal(refreshTeams);
-  const chat = useChat();
+  const chat = useConversation({ myName: profile.name, onTeamChanged: refreshTeams });
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   const openPalette = useCallback(() => setPaletteOpen(true), []);
@@ -45,9 +43,10 @@ export default function AppShell() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const { reset, send } = chat;
+  const { reset, send, startBuilder } = chat;
   const actions = useMemo(() => [
     { id: 'find', label: 'Find teammates', run: () => navigate('/app/find') },
+    { id: 'build', label: 'Build a team', run: () => { navigate('/app/find'); startBuilder(); } },
     { id: 'teams', label: 'Teams and invitations', run: () => navigate('/app/teams') },
     { id: 'me', label: 'My profile and memory', run: () => navigate('/app/me') },
     { id: 'new', label: 'Start a new chat', run: () => { reset(); navigate('/app/find'); } },
@@ -58,9 +57,9 @@ export default function AppShell() {
       run: () => { navigate('/app/find'); send(prompt); },
     })),
     { id: 'out', label: 'Sign out', run: signOut },
-  ], [navigate, reset, send, signOut]);
+  ], [navigate, reset, send, startBuilder, signOut]);
 
-  const shared = { profile, chat, proposal, teams, invites, respondToInvite: respond, openPalette };
+  const shared = { profile, chat, teams, invites, respondToInvite: respond, openPalette };
 
   return (
     <div className="shell">

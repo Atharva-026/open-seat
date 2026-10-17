@@ -1,11 +1,11 @@
 import IntroPath from './IntroPath.jsx';
 
-export default function CandidateRow({ candidate, added, canAdd, onToggle }) {
+export default function CandidateRow({ candidate, chosen, disabled, actionLabel, onAction }) {
   const { name, githubLogin, isDemo, score, fills, reasons, intro } = candidate;
 
   return (
     <li className="cand">
-      <span className={`cand-seat ${added ? 'cand-seat-on' : ''}`} aria-hidden="true">{name.slice(0, 1)}</span>
+      <span className={`cand-seat ${chosen ? 'cand-seat-on' : ''}`} aria-hidden="true">{name.slice(0, 1)}</span>
       <div className="cand-main">
         <div className="cand-head">
           <strong>{name}</strong>
@@ -21,10 +21,13 @@ export default function CandidateRow({ candidate, added, canAdd, onToggle }) {
       </div>
       <div className="cand-side">
         <span className="cand-score" title="Match score out of 100">{score}</span>
-        <button type="button" className={added ? 'link-btn' : 'seat-btn'}
-                disabled={!added && !canAdd} onClick={() => onToggle(candidate)}>
-          {added ? 'Remove' : 'Add to team'}
-        </button>
+        {chosen
+          ? <span className="muted cand-in">In your team</span>
+          : (
+            <button type="button" className="seat-btn" disabled={disabled} onClick={() => onAction(candidate)}>
+              {actionLabel}
+            </button>
+          )}
       </div>
     </li>
   );

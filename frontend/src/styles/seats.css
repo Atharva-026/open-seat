@@ -1,0 +1,7 @@
+.seat-row { display: flex; flex-wrap: wrap; gap: 12px 22px; margin: 12px 0 0; padding: 0; list-style: none; }
+.seat-cell { display: flex; align-items: center; gap: 8px; color: var(--dim); font-size: 0.9rem; }
+.seat-cell-box { width: 30px; height: 30px; display: grid; place-items: center; border: 1px dashed var(--dim); border-radius: 9px; font-size: 0.8rem; font-weight: 700; transition: background 0.25s, border-color 0.25s; }
+.seat-cell-filled { color: var(--paper); }
+.seat-cell-filled .seat-cell-box { background: var(--seat); border: 1px solid var(--seat); color: var(--seat-ink); }
+.seat-cell-pending { color: var(--paper); }
+.seat-cell-pending .seat-cell-box { border: 1px solid var(--seat); color: var(--seat); }

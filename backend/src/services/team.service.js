@@ -9,11 +9,12 @@ import { bus, EVENTS } from '../agents/events.js';
 const HACKATHON = { id: 'graph-hacks-2026', name: 'Graph Hacks 2026' };
 const MAX_TEAM_SIZE = 4;
 
-export async function formTeam({ me, name, members }) {
+export async function formTeam({ me, name, members, size }) {
   const others = [...new Set(members)].filter((login) => login !== me);
   if (!others.length) throw new HttpError(400, 'Add at least one teammate');
-  if (others.length + 1 > MAX_TEAM_SIZE) {
-    throw new HttpError(400, `A team can have at most ${MAX_TEAM_SIZE} people`);
+  const seats = size ?? others.length + 1;
+  if (!Number.isInteger(seats) || seats < others.length + 1 || seats > MAX_TEAM_SIZE) {
+    throw new HttpError(400, `Team size must be between ${others.length + 1} and ${MAX_TEAM_SIZE}`);
   }
   const found = await personRepository.findExisting(others);
   if (found.length !== others.length) throw new HttpError(400, 'One or more teammates were not found');
@@ -22,6 +23,7 @@ export async function formTeam({ me, name, members }) {
   await teamRepository.createTeam({
     ...team,
     createdBy: me,
+    size: seats,
     hackathonId: HACKATHON.id,
     hackathonName: HACKATHON.name,
   });
@@ -42,9 +44,31 @@ export async function listTeams(me) {
   ]);
   return teams.map((team) => ({
     ...team,
+    size: team.size ?? MAX_TEAM_SIZE,
     invites: invites.filter((i) => i.teamId === team.id),
     events: events.filter((e) => e.teamId === team.id),
   }));
+}
+
+export async function inviteMore({ me, teamId, logins }) {
+  const team = await teamRepository.getTeamForInvite(teamId);
+  if (!team || !team.members.includes(me)) throw new HttpError(404, 'Team not found');
+  if (team.createdBy && team.createdBy !== me) {
+    throw new HttpError(403, 'Only the person who created the team can invite more people');
+  }
+
+  const size = team.size ?? MAX_TEAM_SIZE;
+  const fresh = [...new Set(logins)].filter((login) => !team.members.includes(login) && !team.pending.includes(login));
+  if (!fresh.length) throw new HttpError(400, 'Those people are already on the team or invited');
+  if (fresh.length > size - team.members.length - team.pending.length) {
+    throw new HttpError(400, 'Not enough open seats');
+  }
+  const found = await personRepository.findExisting(fresh);
+  if (found.length !== fresh.length) throw new HttpError(400, 'One or more teammates were not found');
+
+  await teamRepository.setTeamStatus(teamId, 'forming');
+  const sender = await getProfile(me);
+  await sendInvites({ team: { id: teamId, name: team.name }, senderName: sender?.name ?? me, logins: fresh });
 }
 
 export async function submitFeedback({ me, teamId, entries }) {

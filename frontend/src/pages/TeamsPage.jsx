@@ -6,16 +6,15 @@ export default function TeamsPage() {
   const { profile, teams, invites, respondToInvite } = useOutletContext();
   const navigate = useNavigate();
 
-  const findMore = (logins) =>
-    navigate('/app/find', { state: { draft: `My team so far: ${logins.join(', ')}. We still need ` } });
+  const fillSeats = (team) => navigate('/app/find', { state: { fill: team } });
 
   return (
     <div className="page">
       <header className="page-head"><h1>Teams</h1></header>
       <InboxPanel invites={invites} onRespond={respondToInvite} />
-      <TeamsPanel teams={teams} me={profile.githubLogin} onUseTeam={findMore} />
+      <TeamsPanel teams={teams} me={profile.githubLogin} onFill={fillSeats} />
       {!teams.length && !invites.length && (
-        <p className="muted">No teams yet. Ask for teammates in Find teammates, add people, and send invitations.</p>
+        <p className="muted">No teams yet. Open Find teammates and build one.</p>
       )}
     </div>
   );

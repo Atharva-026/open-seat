@@ -49,18 +49,13 @@ kbd { padding: 2px 8px; border: 1px solid var(--line); border-radius: 6px; backg
 .intro-candidate { font-weight: 700; }
 .intro-edge { color: var(--dim); font-size: 0.8rem; }
 
-.dock { position: sticky; bottom: 0; padding-bottom: calc(14px + env(safe-area-inset-bottom)); background: var(--ink); border-top: 1px solid var(--line); }
-.party-bar { display: grid; gap: 10px; padding: 12px 0; }
-.slots { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 0; padding: 0; list-style: none; }
-.slot { display: flex; align-items: center; gap: 8px; color: var(--dim); font-size: 0.9rem; }
-.slot-seat { width: 28px; height: 28px; display: grid; place-items: center; border: 1px dashed var(--dim); border-radius: 8px; font-size: 0.8rem; font-weight: 700; transition: background 0.2s; }
-.slot-filled { color: var(--paper); }
-.slot-filled .slot-seat { background: var(--seat); border: 1px solid var(--seat); color: var(--seat-ink); }
-.slot-x { padding: 0 4px; border: 0; background: none; color: var(--dim); font-size: 1.1rem; cursor: pointer; }
-.slot-x:hover { color: var(--paper); }
-.party-send { display: flex; gap: 10px; }
-.party-send input { flex: 1; min-width: 0; }
-.party-note { color: var(--dim); font-size: 0.85rem; }
+.dock { position: sticky; bottom: 0; padding: 12px 0 calc(14px + env(safe-area-inset-bottom)); background: var(--ink); border-top: 1px solid var(--line); }
+.size-choices { margin-top: 12px; }
+.builder-card { display: grid; gap: 14px; margin-top: 14px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; }
+.builder-card input { max-width: 320px; }
+.builder-card .button { justify-self: start; }
+.msg-body .seat-row { margin-top: 14px; }
+.cand-in { font-size: 0.85rem; }
 .composer { display: flex; align-items: flex-end; gap: 10px; }
 .composer textarea { flex: 1; min-width: 0; resize: none; border-radius: 14px; background: var(--surface); line-height: 1.4; }
 .dock-hint { margin-top: 8px; color: var(--dim); font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.03em; }

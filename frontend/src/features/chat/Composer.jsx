@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 const MAX_HEIGHT = 168;
 
-export default function Composer({ onSend, disabled, initialText = '' }) {
-  const [text, setText] = useState(initialText);
+export default function Composer({ onSend, disabled, placeholder = 'Describe who you need' }) {
+  const [text, setText] = useState('');
   const ref = useRef(null);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function Composer({ onSend, disabled, initialText = '' }) {
 
   return (
     <form className="composer" onSubmit={submit}>
-      <textarea ref={ref} rows={1} value={text} maxLength={500} placeholder="Describe who you need"
+      <textarea ref={ref} rows={1} value={text} maxLength={500} placeholder={placeholder}
                 aria-label="Message Open Seat"
                 onChange={(e) => setText(e.target.value)} onKeyDown={onKeyDown} />
       <button type="submit" className="button" disabled={!text.trim() || disabled}>Send</button>

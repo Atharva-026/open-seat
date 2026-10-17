@@ -1,16 +1,17 @@
 import { getGraph } from '../db/client.js';
 
-export async function createTeam({ id, name, createdBy, hackathonId, hackathonName }) {
+export async function createTeam({ id, name, createdBy, size, hackathonId, hackathonName }) {
   const graph = await getGraph();
   await graph.query(
     `MERGE (h:Hackathon {id: $hackathonId})
      SET h.name = $hackathonName
-     CREATE (t:Team {id: $id, name: $name, status: 'forming', outcome: 'in progress', createdBy: $createdBy, isDemo: false, createdAt: $now})
+     CREATE (t:Team {id: $id, name: $name, status: 'forming', outcome: 'in progress',
+                     createdBy: $createdBy, size: $size, createdAt: $now, isDemo: false})
      CREATE (t)-[:ENTERED]->(h)
      WITH t
      MATCH (p:Person {githubLogin: $createdBy})
      CREATE (p)-[:MEMBER_OF]->(t)`,
-    { params: { id, name, createdBy, hackathonId, hackathonName, now: Date.now() } }
+    { params: { id, name, createdBy, size, hackathonId, hackathonName, now: Date.now() } }
   );
 }
 
@@ -21,12 +22,26 @@ export async function getTeams(githubLogin) {
      MATCH (m:Person)-[:MEMBER_OF]->(t)
      OPTIONAL MATCH (t)-[:ENTERED]->(h:Hackathon)
      RETURN t.id AS id, t.name AS name, coalesce(t.status, 'confirmed') AS status, h.name AS hackathon,
-            collect({githubLogin: m.githubLogin, name: m.name, isDemo: m.isDemo}) AS members,
-            coalesce(t.createdAt, 0) AS createdAt
+            t.size AS size, t.createdBy AS createdBy, coalesce(t.createdAt, 0) AS createdAt,
+            collect({githubLogin: m.githubLogin, name: m.name, isDemo: m.isDemo}) AS members
      ORDER BY createdAt DESC`,
     { params: { githubLogin } }
   );
   return res.data;
+}
+
+export async function getTeamForInvite(id) {
+  const graph = await getGraph();
+  const res = await graph.roQuery(
+    `MATCH (t:Team {id: $id})
+     OPTIONAL MATCH (m:Person)-[:MEMBER_OF]->(t)
+     WITH t, collect(m.githubLogin) AS members
+     OPTIONAL MATCH (t)-[inv:INVITED {status: 'pending'}]->(p:Person)
+     RETURN t.name AS name, t.createdBy AS createdBy, t.size AS size, members,
+            collect(p.githubLogin) AS pending`,
+    { params: { id } }
+  );
+  return res.data[0] ?? null;
 }
 
 export async function getInvitesForTeams(teamIds) {
