@@ -15,6 +15,17 @@ function parseArgs(raw) {
   }
 }
 
+const SEAT_PATTERN = /^Seat \d+ of \d+:/;
+const TEAM_PATTERN = /My team so far: (.+?)\.$/;
+
+// Seat messages come from the guided team builder: they search for one person and name the team so far.
+function seatContext(message) {
+  if (!SEAT_PATTERN.test(message)) return { seatMode: false, teamLogins: [] };
+  const listed = message.match(TEAM_PATTERN)?.[1] ?? '';
+  const teamLogins = listed === 'just me' ? [] : listed.split(',').map((s) => s.trim()).filter(Boolean);
+  return { seatMode: true, teamLogins };
+}
+
 export async function runMatcherAgent({ me, message, history = [] }) {
   const memory = await memoryService.listMemory(me);
   const messages = [
@@ -22,7 +33,7 @@ export async function runMatcherAgent({ me, message, history = [] }) {
     ...history,
     { role: 'user', content: message },
   ];
-  const ctx = { me, lastMatch: null };
+  const ctx = { me, lastMatch: null, ...seatContext(message) };
   const steps = [];
 
   // Builds the response and writes this request to the user's episodic memory.

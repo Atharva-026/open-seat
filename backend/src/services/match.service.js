@@ -101,7 +101,7 @@ async function attachIntros(candidates, team) {
     .sort((a, b) => b.score - a.score);
 }
 
-export async function findTeammates({ me, needed, teammates = [], limit = 8, preferences = {} }) {
+export async function findTeammates({ me, needed, teammates = [], limit = 8, preferences = {}, ignoreCovered = false }) {
   const known = await skillRepository.listSkills();
   const canonical = new Map(known.map((s) => [s.name.toLowerCase(), s.name]));
   const lookup = (name) => canonical.get(name.trim().toLowerCase());
@@ -111,8 +111,8 @@ export async function findTeammates({ me, needed, teammates = [], limit = 8, pre
 
   const team = [me, ...teammates.filter((login) => login !== me)];
   const have = new Set(await personRepository.getSkillNames(team));
-  const gap = wanted.filter((skill) => !have.has(skill));
-  const alreadyCovered = wanted.filter((skill) => have.has(skill));
+  const gap = ignoreCovered ? wanted : wanted.filter((skill) => !have.has(skill));
+  const alreadyCovered = ignoreCovered ? [] : wanted.filter((skill) => have.has(skill));
 
   if (!gap.length) return { gap, alreadyCovered, unknown, candidates: [] };
 

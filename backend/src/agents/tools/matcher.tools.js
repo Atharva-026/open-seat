@@ -1,5 +1,6 @@
 import * as skillRepository from '../../repositories/skill.repository.js';
 import * as personRepository from '../../repositories/person.repository.js';
+import * as teamRepository from '../../repositories/team.repository.js';
 import { findTeammates } from '../../services/match.service.js';
 import { getProfile } from '../../services/profile.service.js';
 import * as memoryService from '../../services/memory.service.js';
@@ -58,9 +59,18 @@ const findTeammatesTool = {
     if (!isStringList(args.needed) || !args.needed.length || args.needed.length > 10) {
       return { data: { error: '"needed" must be 1 to 10 skill names' }, summary: 'Rejected invalid skill list' };
     }
-    const teammates = isStringList(args.teammates) ? args.teammates : [];
+    const teammates = [
+      ...new Set([...(isStringList(args.teammates) ? args.teammates : []), ...(ctx.teamLogins ?? [])]),
+    ];
     const preferences = await memoryService.getPreferenceMap(ctx.me);
-    const result = await findTeammates({ me: ctx.me, needed: args.needed, teammates, limit: 6, preferences });
+    const result = await findTeammates({
+      me: ctx.me,
+      needed: args.needed,
+      teammates,
+      limit: 6,
+      preferences,
+      ignoreCovered: Boolean(ctx.seatMode),
+    });
     ctx.lastMatch = result;
 
     const data = {
@@ -123,7 +133,36 @@ const rememberPreference = {
   },
 };
 
-const tools = [listSkills, getMyProfile, findTeammatesTool, getPastTeammates, rememberPreference];
+const IGNORED_AREAS = new Set(['language', 'tooling', 'topic']);
+
+const getProfileGaps = {
+  definition: {
+    type: 'function',
+    function: {
+      name: 'get_profile_gaps',
+      description:
+        "Summarize the signed-in user's strong skill areas (level 3 or higher) and the areas where they have none, with how many other people in the graph are strong in each missing area. Use it for any question about the user's gaps or what kind of teammate to look for.",
+      parameters: { type: 'object', properties: {} },
+    },
+  },
+  async run(_args, ctx) {
+    const [mine, community] = await Promise.all([
+      teamRepository.getTeamCategories([ctx.me]),
+      skillRepository.countPeopleByCategory(ctx.me),
+    ]);
+    const strongAreas = mine.filter((area) => !IGNORED_AREAS.has(area));
+    const missingAreas = community
+      .filter((row) => row.category && !IGNORED_AREAS.has(row.category) && !mine.includes(row.category))
+      .map((row) => ({ area: row.category, peopleAvailable: row.people }))
+      .sort((a, b) => b.peopleAvailable - a.peopleAvailable);
+    return {
+      data: { strongAreas, missingAreas },
+      summary: `Found ${missingAreas.length} skill areas you do not cover`,
+    };
+  },
+};
+
+const tools = [listSkills, getMyProfile, findTeammatesTool, getPastTeammates, rememberPreference, getProfileGaps];
 
 export const definitions = tools.map((t) => t.definition);
 const byName = new Map(tools.map((t) => [t.definition.function.name, t]));

@@ -3,7 +3,7 @@ export default function AgentSteps({ steps }) {
 
   return (
     <details className="steps">
-      <summary>What the agent did ({steps.length} steps)</summary>
+      <summary>What the agent did ({steps.length} step{steps.length === 1 ? '' : 's'})</summary>
       <ol>
         {steps.map((step, i) => (
           <li key={`${step.tool}-${i}`}>
