@@ -1,20 +1,25 @@
 :root {
   color-scheme: dark;
-  --night: #0a0f24;
-  --surface: #101735;
-  --raised: #182046;
-  --line: #28335f;
-  --text: #f0f2ff;
-  --muted: #a3acd0;
-  --amber: #ffb81f;
-  --amber-ink: #1a1203;
-  --good: #2fb67c;
-  --bad: #f0647a;
-  --font: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ink: #0b0b0c;
+  --paper: #ecebe4;
+  --dim: #8d8c85;
+  --line: rgba(236, 235, 228, 0.14);
+  --seat: #ffb81f;
+  --seat-ink: #17110a;
+  --good: #3ec28f;
+  --bad: #f2677b;
+  --font: 'Inter Tight', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  /* names used by the logo and older components */
+  /* names used by the app screens, which get the same treatment in the next step */
+  --night: var(--ink);
+  --surface: #141415;
+  --raised: #1c1c1e;
+  --text: var(--paper);
+  --muted: var(--dim);
+  --amber: var(--seat);
+  --amber-ink: var(--seat-ink);
   --bg: var(--night);
   --panel: var(--surface);
-  --ink: var(--text);
-  --accent: var(--amber);
+  --accent: var(--seat);
 }

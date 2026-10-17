@@ -21,8 +21,4 @@ button, input, textarea, select { font: inherit; color: inherit; }
 input, select, textarea { background: var(--night); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
 input::placeholder, textarea::placeholder { color: var(--muted); }
 
-.landing { max-width: 640px; margin: 0 auto; padding: 12vh 24px; display: grid; gap: 24px; justify-items: start; }
-.landing h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); }
-.landing p { color: var(--muted); font-size: 1.1rem; }
-
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

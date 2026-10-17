@@ -1,21 +1,39 @@
+import { useCallback, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../app/AuthContext.jsx';
-import { API_URL } from '../config.js';
-import Logo from '../components/Logo.jsx';
+import { useSmoothScroll } from '../features/landing/useSmoothScroll.js';
+import GraphField from '../features/landing/GraphField.jsx';
+import Loader from '../features/landing/Loader.jsx';
+import TopBar from '../features/landing/TopBar.jsx';
+import Hero from '../features/landing/Hero.jsx';
+import Manifesto from '../features/landing/Manifesto.jsx';
+import HowItWorks from '../features/landing/HowItWorks.jsx';
+import Trace from '../features/landing/Trace.jsx';
+import Finale from '../features/landing/Finale.jsx';
+import '../features/landing/landing.css';
 
 export default function LandingPage() {
   const { status } = useAuth();
+  const [introDone, setIntroDone] = useState(false);
+  const finishIntro = useCallback(() => setIntroDone(true), []);
+  useSmoothScroll();
+
   if (status === 'ready') return <Navigate to="/app/find" replace />;
 
   return (
-    <main className="landing">
-      <Logo />
-      <h1>Find the teammate who fills the gap.</h1>
-      <p>
-        Open Seat reads the projects you have built, finds people whose skills cover what your team
-        is missing, and shows you exactly how it found them.
-      </p>
-      <a className="button" href={`${API_URL}/auth/github`}>Sign in with GitHub</a>
-    </main>
+    <>
+      <Loader onDone={finishIntro} />
+      <GraphField />
+      <div className="landing-root">
+        <TopBar />
+        <main>
+          <Hero ready={introDone} />
+          <Manifesto />
+          <HowItWorks />
+          <Trace />
+          <Finale />
+        </main>
+      </div>
+    </>
   );
 }

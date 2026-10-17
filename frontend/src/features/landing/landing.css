@@ -1,0 +1,79 @@
+.field { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.landing-root { position: relative; z-index: 1; }
+.landing-root a { color: inherit; }
+
+.seat { display: inline-block; width: 44px; height: 44px; border-radius: 12px; border: 2px dashed var(--dim); transition: background 0.4s, border-color 0.4s; }
+.seat-filled { background: var(--seat); border: 2px solid var(--seat); }
+.seat-sm { width: 14px; height: 14px; border-radius: 4px; border-width: 1.5px; vertical-align: -2px; }
+.seat-strip { display: flex; gap: 10px; }
+
+.loader { position: fixed; inset: 0; z-index: 100; display: grid; place-content: center; justify-items: center; gap: 24px; background: var(--ink); }
+.loader .seat { width: 36px; height: 36px; }
+.loader-count { font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.08em; color: var(--dim); }
+
+.strip { display: flex; justify-content: space-between; gap: 16px; padding: 14px clamp(16px, 3vw, 40px); border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
+.party { display: inline-flex; align-items: center; gap: 6px; }
+.party .seat-sm:last-of-type { margin-right: 6px; }
+.nav-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px clamp(16px, 3vw, 40px); }
+.nav-row nav { display: flex; gap: 32px; }
+.nav-row nav a { text-decoration: none; color: var(--dim); font-weight: 500; }
+.nav-row nav a:hover { color: var(--paper); }
+
+.pill { display: inline-flex; align-items: center; padding: 14px 28px; border-radius: 999px; background: var(--paper); color: var(--ink) !important; font-weight: 600; text-decoration: none; transition: background 0.2s; }
+.pill:hover { background: #fff; }
+.pill-sm { padding: 9px 20px; }
+.pill-ghost { background: transparent; color: var(--paper) !important; border: 1px solid var(--line); }
+.pill-ghost:hover { background: rgba(236, 235, 228, 0.08); }
+
+.hero { min-height: calc(100vh - 120px); display: grid; align-content: center; gap: 28px; padding: 5vh clamp(16px, 3vw, 40px) 9vh; }
+.hero h1 { font-size: clamp(3.8rem, 15vw, 15rem); font-weight: 800; letter-spacing: -0.055em; line-height: 0.86; }
+.hero-line { display: block; overflow: hidden; padding-bottom: 0.08em; }
+.hero-line > span { display: block; }
+.prompt-line { min-height: 1.2em; font-size: clamp(1.3rem, 3.4vw, 2.8rem); font-weight: 500; letter-spacing: -0.03em; line-height: 1.15; }
+.caret { display: inline-block; width: 0.09em; height: 1em; margin-left: 0.06em; background: var(--seat); vertical-align: -0.12em; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 32px; font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--dim); }
+.legend li { display: flex; align-items: center; gap: 8px; }
+.legend li:nth-child(2) { opacity: 0; transition: opacity 0.6s; }
+.legend li.on { opacity: 1; }
+.plus { font-style: normal; color: var(--seat); }
+.hero-copy { max-width: 46ch; font-size: 1.15rem; color: var(--dim); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.manifesto { padding: 32vh clamp(16px, 3vw, 40px); }
+.manifesto p { max-width: 20em; font-size: clamp(2rem, 5.4vw, 4.8rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1.04; }
+
+.how, .trace, .finale { padding: 14vh clamp(16px, 3vw, 40px); border-top: 1px solid var(--line); }
+.how { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 40px; align-items: start; }
+.how h2, .trace h2 { font-size: clamp(2.4rem, 6vw, 5.2rem); font-weight: 800; letter-spacing: -0.05em; line-height: 0.95; }
+.how h2 { position: sticky; top: 14vh; }
+.steps-list { list-style: none; margin: 0; padding: 0; }
+.steps-list li { display: grid; grid-template-columns: 64px 1fr; gap: 16px; min-height: 52vh; padding: 28px 0; border-top: 1px solid var(--line); }
+.step-no { font-family: var(--mono); font-size: 0.9rem; color: var(--dim); }
+.steps-list h3 { font-size: clamp(1.6rem, 3vw, 2.4rem); letter-spacing: -0.03em; margin-bottom: 12px; }
+.steps-list p { max-width: 44ch; color: var(--dim); font-size: 1.1rem; margin-bottom: 28px; }
+
+.trace { display: grid; gap: 64px; }
+.trace-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+.trace-row h3 { font-size: clamp(1.8rem, 4vw, 3.2rem); letter-spacing: -0.04em; }
+.trace-row p { color: var(--dim); font-size: 1.1rem; max-width: 52ch; }
+.path { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: clamp(1.4rem, 3.4vw, 2.6rem); font-weight: 700; letter-spacing: -0.03em; }
+.path-node { padding: 8px 20px; border: 1px solid var(--line); border-radius: 999px; }
+.path-you { border-color: var(--seat); }
+.path-target { background: var(--seat); border-color: var(--seat); color: var(--seat-ink); }
+.path-edge { display: inline-flex; align-items: center; gap: 8px; width: 90px; color: var(--seat); }
+.path-edge::before { content: ''; flex: 1; height: 2px; background: var(--seat); }
+.path-edge i { font-family: var(--mono); font-style: normal; font-size: 0.75rem; font-weight: 500; }
+
+.finale { display: grid; justify-items: start; gap: 32px; min-height: 80vh; align-content: center; }
+.finale h2 { font-size: clamp(4rem, 17vw, 17rem); font-weight: 800; letter-spacing: -0.06em; line-height: 0.85; }
+.data-note { max-width: 56ch; color: var(--dim); }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; width: 100%; padding-top: 24px; margin-top: 8vh; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
+
+@media (max-width: 800px) {
+  .strip span:nth-child(2), .nav-row nav { display: none; }
+  .how, .trace-row { grid-template-columns: 1fr; }
+  .how h2 { position: static; }
+  .steps-list li { min-height: 0; }
+  .manifesto { padding: 20vh 16px; }
+}
