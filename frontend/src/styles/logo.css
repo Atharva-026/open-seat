@@ -1,0 +1,31 @@
+.logo { display: inline-flex; align-items: center; gap: 12px; color: var(--paper); font-weight: 800; font-size: 1.4rem; letter-spacing: -0.045em; text-decoration: none; }
+.logo-mark { flex: none; overflow: visible; }
+
+.m-seat { fill: var(--seat); }
+.m-person { fill: var(--seat-ink); }
+.m-open { fill: none; stroke: var(--seat); stroke-width: 3; stroke-dasharray: 6 5; stroke-linecap: round; }
+.m-fill { fill: var(--seat); opacity: 0; }
+.m-dot { fill: var(--paper); opacity: 0; transform: translateX(70px); }
+
+/* loop plays forward and back, with a rest at each end; once plays a single time */
+.logo-loop .m-dot { animation: logo-dot 3.6s ease-in-out infinite alternate; }
+.logo-loop .m-fill { animation: logo-fill 3.6s ease-in-out infinite alternate; }
+.logo-loop .m-open { animation: logo-open 3.6s ease-in-out infinite alternate; }
+.logo-once .m-dot { animation: logo-dot 3.6s ease-in-out 0.4s 1 both; }
+.logo-once .m-fill { animation: logo-fill 3.6s ease-in-out 0.4s 1 both; }
+.logo-once .m-open { animation: logo-open 3.6s ease-in-out 0.4s 1 both; }
+
+@keyframes logo-dot {
+  0%, 12% { opacity: 0; transform: translateX(70px); fill: var(--paper); }
+  20% { opacity: 1; transform: translateX(70px); fill: var(--paper); }
+  58% { opacity: 1; transform: translateX(0); fill: var(--paper); }
+  68%, 100% { opacity: 1; transform: translateX(0); fill: var(--seat-ink); }
+}
+@keyframes logo-fill { 0%, 56% { opacity: 0; } 66%, 100% { opacity: 1; } }
+@keyframes logo-open { 0%, 54% { opacity: 1; } 62%, 100% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .m-dot { opacity: 1; transform: none; fill: var(--seat-ink); }
+  .m-fill { opacity: 1; }
+  .m-open { opacity: 0; }
+}

@@ -25,7 +25,7 @@ export const handleCallback = asyncHandler(async (req, res) => {
   const githubLogin = await syncProfileFromGithub(token);
 
   res.cookie(COOKIES.session, githubLogin, { ...cookieBase, maxAge: 7 * 24 * 60 * 60 * 1000 });
-  res.redirect(env.frontendUrl);
+  res.redirect(`${env.frontendUrl}/app/find`);
 });
 
 export function logout(req, res) {

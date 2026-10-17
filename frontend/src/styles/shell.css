@@ -1,14 +1,15 @@
-.logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.3rem; letter-spacing: -0.04em; }
-
 .shell { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
 .rail { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 32px; padding: 24px 18px; background: var(--surface); border-right: 1px solid var(--line); }
 .nav { display: grid; gap: 4px; }
 .nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; color: var(--muted); text-decoration: none; font-weight: 500; }
 .nav a:hover { color: var(--text); }
 .nav a[aria-current='page'] { color: var(--text); background: var(--raised); }
-.nav-seat { width: 18px; height: 18px; flex: none; }
-.nav-seat rect { fill: none; stroke: var(--muted); stroke-width: 2; stroke-dasharray: 3 3; transition: fill 0.2s; }
-.nav a[aria-current='page'] .nav-seat rect { fill: var(--amber); stroke: var(--amber); stroke-dasharray: none; }
+.nav-seat { width: 20px; height: 20px; flex: none; }
+.nav-seat rect { fill: none; stroke: var(--muted); stroke-width: 1.25; stroke-dasharray: 3 2.5; transition: fill 0.2s, stroke 0.2s; }
+.nav-seat circle { fill: var(--seat-ink); opacity: 0; transition: opacity 0.2s; }
+.nav a[aria-current='page'] .nav-seat rect { fill: var(--seat); stroke: var(--seat); stroke-dasharray: none; }
+.nav a[aria-current='page'] .nav-seat circle { opacity: 1; }
+.rail-home { color: inherit; text-decoration: none; }
 .nav-badge { margin-left: auto; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--amber); color: var(--amber-ink); font-size: 0.75rem; font-weight: 700; text-align: center; }
 .rail-user { margin-top: auto; display: grid; justify-items: start; gap: 6px; color: var(--muted); font-size: 0.9rem; }
 

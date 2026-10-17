@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { API_URL } from '../../config.js';
+import CtaButton from './CtaButton.jsx';
 
 const PROMPT = 'I need a designer and someone who knows computer vision';
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -73,7 +73,7 @@ export default function Hero({ ready }) {
       </p>
 
       <div className="hero-actions">
-        <a className="pill" href={`${API_URL}/auth/github`}>Sign in with GitHub</a>
+        <CtaButton />
         <a className="pill pill-ghost" href="#how">How it works</a>
       </div>
     </section>

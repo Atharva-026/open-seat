@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from './AuthContext.jsx';
 import { useTeams } from '../hooks/useTeams.js';
 import { useInbox } from '../hooks/useInbox.js';
@@ -10,7 +10,8 @@ function NavItem({ to, label, badge = 0 }) {
   return (
     <NavLink to={to}>
       <svg className="nav-seat" viewBox="0 0 20 20" aria-hidden="true">
-        <rect x="2" y="2" width="16" height="16" rx="5" />
+        <rect x="2" y="2" width="16" height="16" rx="4.5" />
+        <circle cx="10" cy="10" r="2.6" />
       </svg>
       <span>{label}</span>
       {badge > 0 && <span className="nav-badge" aria-label={`${badge} pending`}>{badge}</span>}
@@ -31,7 +32,9 @@ export default function AppShell() {
   return (
     <div className="shell">
       <aside className="rail">
-        <Logo />
+        <Link to="/" className="rail-home" aria-label="Back to the Open Seat home page">
+          <Logo size={32} />
+        </Link>
         <nav className="nav" aria-label="Main">
           <NavItem to="/app/find" label="Find teammates" />
           <NavItem to="/app/teams" label="Teams" badge={invites.length} />

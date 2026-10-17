@@ -1,6 +1,4 @@
 import { useCallback, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../app/AuthContext.jsx';
 import { useSmoothScroll } from '../features/landing/useSmoothScroll.js';
 import GraphField from '../features/landing/GraphField.jsx';
 import Loader from '../features/landing/Loader.jsx';
@@ -13,12 +11,9 @@ import Finale from '../features/landing/Finale.jsx';
 import '../features/landing/landing.css';
 
 export default function LandingPage() {
-  const { status } = useAuth();
   const [introDone, setIntroDone] = useState(false);
   const finishIntro = useCallback(() => setIntroDone(true), []);
   useSmoothScroll();
-
-  if (status === 'ready') return <Navigate to="/app/find" replace />;
 
   return (
     <>
