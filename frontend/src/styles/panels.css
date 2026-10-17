@@ -19,8 +19,12 @@
 .steps code { display: block; margin-top: 2px; font-family: var(--mono); font-size: 0.75rem; overflow-wrap: anywhere; }
 .evidence { display: block; color: var(--dim); font-size: 0.85rem; }
 .feedback { display: grid; gap: 10px; margin-top: 14px; }
-.feedback-row { display: grid; grid-template-columns: 90px 90px 1fr; gap: 8px; align-items: center; }
 .feedback input { width: 100%; }
+.mate { display: grid; gap: 10px; padding: 16px 0; border-top: 1px solid var(--line); }
+.mate-meta { color: var(--dim); font-size: 0.9rem; }
+.mate-evidence { margin: 0; padding-left: 18px; color: var(--dim); font-size: 0.9rem; }
+.mate-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.mate-controls input { flex: 1; min-width: 180px; }
 .memory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
 .memory-heading { margin: 22px 0 6px; font-size: 1rem; font-weight: 600; }
 .field { display: block; color: var(--dim); font-size: 0.9rem; }
@@ -39,5 +43,3 @@
 .skill-list .evidence { flex-basis: 100%; }
 .swatch { width: 10px; height: 10px; border-radius: 3px; }
 .level { color: var(--dim); font-size: 0.85rem; }
-
-@media (max-width: 560px) { .feedback-row { grid-template-columns: 1fr; } }

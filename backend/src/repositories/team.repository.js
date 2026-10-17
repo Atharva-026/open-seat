@@ -50,6 +50,7 @@ export async function getInvitesForTeams(teamIds) {
     `MATCH (t:Team)-[inv:INVITED]->(p:Person)
      WHERE t.id IN $teamIds
      RETURN t.id AS teamId, inv.id AS id, inv.status AS status, inv.simulated AS simulated,
+            inv.forSkills AS forSkills,
             p.githubLogin AS login, p.name AS name, p.isDemo AS isDemo
      ORDER BY inv.at`,
     { params: { teamIds } }
@@ -93,12 +94,13 @@ export async function getTeamOutcome(id) {
   return res.data[0];
 }
 
-export async function createInvite({ teamId, id, login, message }) {
+export async function createInvite({ teamId, id, login, message, forSkills = [] }) {
   const graph = await getGraph();
   await graph.query(
     `MATCH (t:Team {id: $teamId}), (p:Person {githubLogin: $login})
-     CREATE (t)-[:INVITED {id: $id, status: 'pending', message: $message, at: $now, simulated: false}]->(p)`,
-    { params: { teamId, id, login, message, now: Date.now() } }
+     CREATE (t)-[:INVITED {id: $id, status: 'pending', message: $message, at: $now,
+                           simulated: false, forSkills: $forSkills}]->(p)`,
+    { params: { teamId, id, login, message, forSkills, now: Date.now() } }
   );
 }
 
@@ -172,7 +174,7 @@ export async function saveFeedback({ from, hackathonId, entries }) {
     `UNWIND $entries AS e
      MATCH (a:Person {githubLogin: $from}), (b:Person {githubLogin: e.to})
      MERGE (a)-[t:TEAMED_WITH {hackathon: $hackathonId}]->(b)
-     SET t.rating = e.rating, t.note = e.note`,
+     SET t.rating = e.rating, t.note = e.note, t.delivered = e.delivered`,
     { params: { from, hackathonId, entries } }
   );
 }
@@ -187,4 +189,17 @@ export async function getTeamCategories(members) {
     { params: { members } }
   );
   return res.data.map((row) => row.category).filter(Boolean);
+}
+
+// Strongest skill areas per person, with the repositories that prove them.
+export async function getSkillsForPeople(logins) {
+  const graph = await getGraph();
+  const res = await graph.roQuery(
+    `MATCH (p:Person)-[r:HAS_SKILL]->(s:Skill)
+     WHERE p.githubLogin IN $logins AND NOT s.category IN ['language', 'tooling', 'topic']
+     RETURN p.githubLogin AS login, s.name AS name, r.level AS level, r.evidence AS evidence
+     ORDER BY r.level DESC`,
+    { params: { logins } }
+  );
+  return res.data;
 }

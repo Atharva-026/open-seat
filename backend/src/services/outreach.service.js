@@ -54,7 +54,7 @@ export async function respondToInvite({ inviteId, me, accept }) {
   await answer(invite, accept, false);
 }
 
-export async function sendInvites({ team, senderName, logins }) {
+export async function sendInvites({ team, senderName, logins, forSkills = {} }) {
   await log(team.id, 'started', `Drafting ${logins.length} invitation(s) for ${team.name}`);
 
   const sent = [];
@@ -62,7 +62,7 @@ export async function sendInvites({ team, senderName, logins }) {
     const profile = await getProfile(login);
     const { message, drafted } = await draftInvite({ senderName, teamName: team.name, profile });
     const id = crypto.randomUUID();
-    await teamRepository.createInvite({ teamId: team.id, id, login, message });
+    await teamRepository.createInvite({ teamId: team.id, id, login, message, forSkills: forSkills[login] ?? [] });
     await log(team.id, 'invited', `${profile.name} was invited (${drafted === 'ai' ? 'AI-drafted' : 'template'} message)`);
     sent.push({ id, teamId: team.id, login, name: profile.name, isDemo: Boolean(profile.isDemo) });
   }

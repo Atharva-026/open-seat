@@ -9,7 +9,18 @@ import { bus, EVENTS } from '../agents/events.js';
 const HACKATHON = { id: 'graph-hacks-2026', name: 'Graph Hacks 2026' };
 const MAX_TEAM_SIZE = 4;
 
-export async function formTeam({ me, name, members, size }) {
+// picks: [{ login, skills: [name] }] sent by the chat; keeps only short strings.
+function cleanPicks(picks = []) {
+  const map = {};
+  for (const pick of picks) {
+    if (pick && typeof pick.login === 'string' && Array.isArray(pick.skills)) {
+      map[pick.login] = pick.skills.filter((s) => typeof s === 'string').map((s) => s.slice(0, 40)).slice(0, 5);
+    }
+  }
+  return map;
+}
+
+export async function formTeam({ me, name, members, size, picks }) {
   const others = [...new Set(members)].filter((login) => login !== me);
   if (!others.length) throw new HttpError(400, 'Add at least one teammate');
   const seats = size ?? others.length + 1;
@@ -29,7 +40,7 @@ export async function formTeam({ me, name, members, size }) {
   });
 
   const sender = await getProfile(me);
-  await sendInvites({ team, senderName: sender?.name ?? me, logins: others });
+  await sendInvites({ team, senderName: sender?.name ?? me, logins: others, forSkills: cleanPicks(picks) });
   return team;
 }
 
@@ -38,19 +49,28 @@ export async function listTeams(me) {
   if (!teams.length) return [];
 
   const ids = teams.map((t) => t.id);
-  const [invites, events] = await Promise.all([
+  const logins = [...new Set(teams.flatMap((t) => t.members.map((m) => m.githubLogin)))];
+  const [invites, events, skillRows] = await Promise.all([
     teamRepository.getInvitesForTeams(ids),
     teamRepository.getEventsForTeams(ids),
+    teamRepository.getSkillsForPeople(logins),
   ]);
+  const evidenceFor = (login) =>
+    skillRows
+      .filter((row) => row.login === login)
+      .slice(0, 3)
+      .map(({ name, level, evidence }) => ({ name, level, repos: (evidence ?? []).slice(0, 3) }));
+
   return teams.map((team) => ({
     ...team,
-    size: team.size ?? MAX_TEAM_SIZE,
+    size: team.size ?? MAX_TEAM_SIZE, // older teams can grow up to the maximum
+    members: team.members.map((m) => ({ ...m, evidence: evidenceFor(m.githubLogin) })),
     invites: invites.filter((i) => i.teamId === team.id),
     events: events.filter((e) => e.teamId === team.id),
   }));
 }
 
-export async function inviteMore({ me, teamId, logins }) {
+export async function inviteMore({ me, teamId, logins, picks }) {
   const team = await teamRepository.getTeamForInvite(teamId);
   if (!team || !team.members.includes(me)) throw new HttpError(404, 'Team not found');
   if (team.createdBy && team.createdBy !== me) {
@@ -68,7 +88,12 @@ export async function inviteMore({ me, teamId, logins }) {
 
   await teamRepository.setTeamStatus(teamId, 'forming');
   const sender = await getProfile(me);
-  await sendInvites({ team: { id: teamId, name: team.name }, senderName: sender?.name ?? me, logins: fresh });
+  await sendInvites({
+    team: { id: teamId, name: team.name },
+    senderName: sender?.name ?? me,
+    logins: fresh,
+    forSkills: cleanPicks(picks),
+  });
 }
 
 export async function submitFeedback({ me, teamId, entries }) {

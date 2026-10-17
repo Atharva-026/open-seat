@@ -146,9 +146,10 @@ export function useConversation({ myName, onTeamChanged }) {
     const b = builderRef.current;
     if (!b || b.stage !== 'ready') return;
     const logins = b.picked.map((p) => p.githubLogin);
+    const picks = b.picked.map((p) => ({ login: p.githubLogin, skills: p.fills.map((f) => f.name) }));
     try {
-      if (b.teamId) await inviteMore(b.teamId, logins);
-      else await createTeam({ name: teamName, members: logins, size: b.size });
+      if (b.teamId) await inviteMore(b.teamId, logins, picks);
+      else await createTeam({ name: teamName, members: logins, size: b.size, picks });
       setBuilder(null);
       append(botMessage(
         `Invitations sent to ${b.picked.map((p) => p.name).join(', ')}. Replies and the team status appear under Teams.`,

@@ -12,4 +12,5 @@ export const submitFeedback = (teamId, entries) =>
   request(`/api/teams/${teamId}/feedback`, post({ entries }));
 export const fetchInbox = () => request('/api/invites');
 export const respondToInvite = (id, accept) => request(`/api/invites/${id}/respond`, post({ accept }));
-export const inviteMore = (teamId, members) => request(`/api/teams/${teamId}/invites`, post({ members }));
+export const inviteMore = (teamId, members, picks) =>
+  request(`/api/teams/${teamId}/invites`, post({ members, picks }));
