@@ -11,6 +11,9 @@ export const env = {
   falkordb: {
     host: process.env.FALKORDB_HOST ?? 'localhost',
     port: Number(process.env.FALKORDB_PORT ?? 6379),
+    username: process.env.FALKORDB_USERNAME || undefined,
+    password: process.env.FALKORDB_PASSWORD || undefined,
+    tls: process.env.FALKORDB_TLS === 'true',
   },
   github: {
     clientId: process.env.GITHUB_CLIENT_ID,
@@ -21,6 +24,7 @@ export const env = {
   groqModel: process.env.GROQ_MODEL ?? 'openai/gpt-oss-120b',
   groqFallbackModel: process.env.GROQ_FALLBACK_MODEL,
   sessionSecret: process.env.SESSION_SECRET,
+  isProduction: process.env.NODE_ENV === 'production',
 };
 
 // Call once at server startup so a missing key fails loudly, not mid-request.

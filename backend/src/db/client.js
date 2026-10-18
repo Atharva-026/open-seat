@@ -7,8 +7,11 @@ let client;
 
 export async function getClient() {
   if (!client) {
+    const { host, port, username, password, tls } = env.falkordb;
     client = await FalkorDB.connect({
-      socket: { host: env.falkordb.host, port: env.falkordb.port },
+      socket: { host, port, ...(tls ? { tls: true } : {}) },
+      ...(username ? { username } : {}),
+      ...(password ? { password } : {}),
     });
   }
   return client;

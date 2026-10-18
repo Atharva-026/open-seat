@@ -15,6 +15,7 @@ Built for **Graph Hacks** (WeMakeDevs x FalkorDB), track: **Agent Memory and Coo
 3. **Warm introductions.** Results show the path through people already on your team, for example `You ★5 Pooja ★4 Hana`.
 4. **Invite and coordinate.** The Outreach agent drafts invitations, tracks replies, and confirms the team when every invitation is answered.
 5. **Remember.** After the event you rate teammates. The Memory agent records the team and what worked, and future suggestions change.
+6. **The Open Seats board:** teams post the seats they still need, and everyone sees them ranked by fit through the skills graph, with warm-introduction paths.
 
 ## How FalkorDB is used
 
@@ -35,10 +36,14 @@ FalkorDB holds all state, and the agents share it.
 - `(:Person {githubLogin, name, avatarUrl, timezone, availability, isDemo})`
 - `(:Skill {name, category})`
 - `(:Team {id, name, status, size, createdBy, createdAt, isDemo})`
+- `(:Seat {id, title, pitch, status, postedAt, isDemo})`
 - `(:Hackathon {id, name})`
 - `(:AgentEvent {id, agent, action, detail, at})`
 - `(Person)-[:HAS_SKILL {level, evidence}]->(Skill)`
 - `(Person)-[:MEMBER_OF]->(Team)`
+- `(Team)-[:POSTED]->(Seat)`
+- `(Seat)-[:NEEDS]->(Skill)`
+- `(Person)-[:REQUESTED {id, status, message, at, simulated}]->(Seat)`
 - `(Team)-[:ENTERED]->(Hackathon)`
 - `(Team)-[:INVITED {id, status, message, at, simulated, forSkills}]->(Person)`
 - `(Person)-[:TEAMED_WITH {rating, note, delivered, hackathon}]->(Person)`

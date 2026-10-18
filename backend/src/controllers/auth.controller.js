@@ -6,7 +6,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { buildAuthorizeUrl, exchangeCodeForToken } from '../services/github.service.js';
 import { syncProfileFromGithub } from '../services/profile.service.js';
 
-const cookieBase = { httpOnly: true, sameSite: 'lax', signed: true };
+const cookieBase = { httpOnly: true, sameSite: 'lax', signed: true, secure: env.isProduction };
 
 export function startLogin(req, res) {
   const state = crypto.randomBytes(16).toString('hex');
