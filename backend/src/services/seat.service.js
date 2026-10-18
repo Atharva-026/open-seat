@@ -72,7 +72,8 @@ export async function listBoard(me) {
 
   const ranked = seats
     .map((seat) => {
-      const fit = fitFor(seat.needs, levels);
+      if (!Array.isArray(seat.needs)) console.error('Seat row without needs:', JSON.stringify(seat));
+      const fit = fitFor(seat.needs ?? [], levels);
       const intro = bestIntro(seat.teamId, direct, via);
       const reasons = [];
       if (fit.covered.length) {
