@@ -1,7 +1,7 @@
 // Open seats posted by demo teams, so the board has something to rank from day one.
 const TEAM_NAMES = [
   'Night Shift', 'Edge Cases', 'Cold Start', 'Hot Path',
-  'Dead Letter', 'Rubber Duck', 'Stack Trace', 'Merge Conflict',
+  'Dead Letter', 'Rubber Duck', 'Stack Trace', 'Merge Conflict', 'Pull Request',
 ];
 
 const SEATS = [
@@ -13,12 +13,13 @@ const SEATS = [
   { title: 'Data storyteller', skills: ['Data Visualization', 'Pandas'], pitch: 'We have the dataset and no idea how to show what it says.' },
   { title: 'Pitch lead', skills: ['Product Pitching', 'Technical Writing'], pitch: 'The build is on track. We need someone to turn it into three clear minutes.' },
   { title: 'ML engineer', skills: ['PyTorch', 'Hugging Face'], pitch: 'We want to fine-tune a small model on campus data and need a second pair of hands.' },
+  { title: 'Full-stack builder', skills: ['React', 'Express'], pitch: 'We have a design and a database. We need someone who can wire the two together by tomorrow.' },
 ];
 
 export function generateBoard(people) {
   return SEATS.map((seat, i) => {
-    const owner = people[(i * 5 + 3) % people.length];
-    const member = people[(i * 5 + 11) % people.length];
+    const owner = people[(i * 7 + 3) % people.length];
+    const member = people[(i * 7 + 20) % people.length];
     return {
       id: `demo-board-${i + 1}`,
       name: TEAM_NAMES[i],

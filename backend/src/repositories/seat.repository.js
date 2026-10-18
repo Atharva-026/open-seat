@@ -18,7 +18,7 @@ export const listOpenSeats = (excludeTeamIds) =>
      OPTIONAL MATCH (o:Person) WHERE o.githubLogin = t.createdBy
      RETURN s.id AS id, s.title AS title, s.pitch AS pitch, coalesce(s.postedAt, 0) AS postedAt,
             coalesce(s.isDemo, false) AS isDemo, t.id AS teamId, t.name AS teamName,
-            coalesce(t.size, 4) AS size, memberCount, o.name AS ownerName
+            coalesce(t.size, 4) AS size, memberCount, needs, o.name AS ownerName
      ORDER BY postedAt DESC`,
     { excludeTeamIds }
   );
