@@ -2,11 +2,11 @@
 
 **Find the teammate who fills the gap.** Open Seat is an AI agent that builds hackathon teams around skill gaps, remembers who worked well together, and shows the graph path behind every suggestion.
 
-Built for **Graph Hacks** (WeMakeDevs x FalkorDB), track: **Agent Memory and Coordination**. FalkorDB is the context layer for every agent.
+Built for **Graph Hacks** (WeMakeDevs x FalkorDB), tracks: **Agent Memory and Coordination** and **Agents That Act on Connected Data**. FalkorDB is the context layer for every agent.
 
-- Live demo: [URL, or delete this line]
-- Demo video: [URL]
-- Blog post: [URL]
+- Live demo: https://open-seat-i2gc.onrender.com (the free server sleeps when idle, so the first load can take about a minute)
+- Demo video: https://youtu.be/bK3m4vVFo0A
+- Blog post: https://atharva026.hashnode.dev/a-team-is-a-number-of-seats
 
 ## What it does
 
@@ -25,6 +25,7 @@ FalkorDB holds all state, and the agents share it.
 |---|---|
 | Gap coverage | Cypher subtracts the skills your team has (level 3 or higher) from the skills it needs and ranks people who fill the rest |
 | Warm introductions | A two-hop query through `TEAMED_WITH` edges: a teammate who worked with someone on your team and with the candidate (both ratings 3 or higher) |
+| Open Seats board | `Seat` nodes with `NEEDS` edges to `Skill` nodes, ranked per viewer by fit plus introduction paths; `REQUESTED` edges drive accept and decline |
 | Shared state between agents | Team status, `INVITED` edges and `AgentEvent` nodes live in the graph; agents hand off through events and read the same state |
 | Per-user memory | One private graph per user, `user_<githubLogin>`, in the same FalkorDB instance |
 | Memory types | Semantic: `Preference`. Episodic: `Episode`, `TeamHistory`. Procedural: `Pattern` |
@@ -58,6 +59,15 @@ FalkorDB holds all state, and the agents share it.
 
 ### Core queries
 
+All Cypher lives in `backend/src/repositories`. The main ones:
+
+```cypher
+// Skills your team already covers (level 3 or higher counts as covered)
+MATCH (p:Person)-[r:HAS_SKILL]->(s:Skill)
+WHERE p.githubLogin IN $team AND r.level >= 3
+RETURN DISTINCT s.name
+```
+
 ```cypher
 // Candidates for a skill gap, with past collaboration ratings
 MATCH (c:Person)-[h:HAS_SKILL]->(s:Skill)
@@ -65,12 +75,26 @@ WHERE s.name IN $gap AND NOT c.githubLogin IN $team
 WITH c, collect({name: s.name, level: h.level, evidence: h.evidence}) AS fills
 OPTIONAL MATCH (m:Person)-[t:TEAMED_WITH]-(c) WHERE m.githubLogin IN $team
 RETURN c, fills, avg(t.rating) AS history, count(t) AS timesTeamed
+```
 
+```cypher
 // Warm introductions through a mutual teammate
 MATCH (a:Person)-[t1:TEAMED_WITH]-(mid:Person)-[t2:TEAMED_WITH]-(b:Person)
 WHERE a.githubLogin IN $team AND b.githubLogin IN $candidates
   AND NOT mid.githubLogin IN $team AND t1.rating >= 3 AND t2.rating >= 3
 RETURN a, mid, b, t1.rating, t2.rating
+```
+
+```cypher
+// Open Seats board: every open seat with the skills it needs and its team
+MATCH (t:Team)-[:POSTED]->(s:Seat)
+WHERE s.status = 'open' AND NOT t.id IN $excludeTeamIds
+OPTIONAL MATCH (s)-[:NEEDS]->(k:Skill)
+WITH t, s, collect(k.name) AS needs
+OPTIONAL MATCH (m:Person)-[:MEMBER_OF]->(t)
+WITH t, s, needs, count(m) AS memberCount
+RETURN s.id AS id, s.title AS title, s.pitch AS pitch, t.id AS teamId,
+       t.name AS teamName, memberCount, needs
 ```
 
 ## Agents
@@ -85,7 +109,7 @@ Ranking: 60% gap coverage, 30% skill strength, 10% past collaboration, plus a sm
 ## Real data and demo data
 
 - **Real:** people who sign in with GitHub. Only public repositories are read. The GitHub token is used once and never stored.
-- **Demo:** 40 synthetic personas (`backend/src/seed`, fixed random seed), 3 fictional past hackathons, and their ratings. They are marked `isDemo`, labelled "demo persona" in the UI, and their invitation replies are **simulated** and labelled so.
+- **Demo:** 40 synthetic personas (`backend/src/seed`, fixed random seed), 3 fictional past hackathons, and their ratings, plus 9 demo teams with an open seat each on the Open Seats board. They are marked `isDemo`, labelled "demo persona" in the UI, and their invitation replies are **simulated** and labelled so.
 
 ## Run it locally
 
@@ -96,9 +120,12 @@ git clone https://github.com/Atharva-026/open-seat.git
 cd open-seat
 docker compose up -d                  # FalkorDB on 6379, browser on 3000
 cp .env.example .env                  # then fill in the values
-cd backend && npm install && npm run seed && cd ..
-cd frontend && npm install && cd ..
-npm install && npm run dev            # backend :3001, frontend :5173
+npm install
+npm install --prefix backend
+npm install --prefix frontend
+npm run seed                          # demo community
+npm run seed:board --prefix backend   # demo teams for the Open Seats board
+npm run dev                           # backend :3001, frontend :5173
 ```
 
 Create a GitHub OAuth app with homepage `http://localhost:5173` and callback `http://localhost:3001/auth/github/callback`, and put its client ID and secret in `.env`.
@@ -108,8 +135,18 @@ Create a GitHub OAuth app with homepage `http://localhost:5173` and callback `ht
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_CALLBACK_URL` | GitHub sign-in |
 | `SESSION_SECRET` | signs the session cookie |
 | `GROQ_API_KEY`, `GROQ_MODEL`, `GROQ_FALLBACK_MODEL` | the agents' language model |
-| `FALKORDB_HOST`, `FALKORDB_PORT` | database connection |
+| `FALKORDB_HOST`, `FALKORDB_PORT` | database connection (default `localhost:6379`) |
+| `FALKORDB_USERNAME`, `FALKORDB_PASSWORD`, `FALKORDB_TLS` | optional, for a hosted FalkorDB such as FalkorDB Cloud |
 | `PORT`, `FRONTEND_URL` | server settings |
+
+## Deployment
+
+The live demo runs as one Render web service (the Express server also serves the built React app, so everything is on one origin) with the graph on a FalkorDB Cloud free instance.
+
+- Build command: `npm run build`. Start command: `npm start`.
+- Set the variables above in the host's environment settings, including `NODE_ENV=production`, `FRONTEND_URL`, `GITHUB_CALLBACK_URL` and the `FALKORDB_*` connection values.
+- Use a separate GitHub OAuth app for production, with the live URL as homepage and `<live-url>/auth/github/callback` as the callback.
+- Seed the hosted graph once with `npm run seed` and `npm run seed:board --prefix backend`, with the `FALKORDB_*` variables pointing at the hosted instance.
 
 ## Structure
 
@@ -126,19 +163,19 @@ frontend/src/
 
 - Open Seat stores derived skills, not your repository contents.
 - Your private graph holds only your preferences, requests and learned patterns. "Forget everything" on your profile page erases it.
-- [Add: profile deletion from the shared graph, if you build it before submitting.]
 
 ## Known limitations
 
 - Demo personas reply automatically, so invitation flows with real people need a second signed-in account.
-- The Groq free tier is rate limited; the app falls back to a second model.
+- The Groq free tier is rate limited; the app falls back to a second model. The AI matcher and team and invitation creation are also rate limited per visitor.
 - Agents hand off through an in-process event bus, so run a single server instance.
 - Skill evidence comes from profile repositories, not commit statistics.
-- [Add anything else that is honest, for example features you did not finish.]
+- Deleting your profile from the shared graph is not built yet. "Forget everything" erases your private memory only.
+- The free hosting tiers sleep when idle, and the free FalkorDB Cloud instance has no persistence, so the hosted demo data may need to be re-seeded.
 
 ## How AI tools were used
 
-[Edit this so it is true. For example: "I used Claude as a coding and design assistant while building this project. I chose the idea, the architecture and the data model, ran and tested every feature, and can explain the code. The agents inside the product use Groq models."]
+I used Claude as a coding assistant while building this. I chose the idea and the data model, tested every feature, and can explain the code. The agents inside the product use Groq models.
 
 ## Acknowledgements
 
