@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext.jsx';
 import { useTeams } from '../hooks/useTeams.js';
 import { useInbox } from '../hooks/useInbox.js';
+import { useSeatRequests } from '../hooks/useSeatRequests.js';
 import { useConversation } from '../features/chat/useConversation.js';
 import { EXAMPLE_PROMPTS } from '../features/chat/prompts.js';
 import CommandPalette from './CommandPalette.jsx';
@@ -26,6 +27,7 @@ export default function AppShell() {
   const navigate = useNavigate();
   const { teams, refresh: refreshTeams } = useTeams();
   const { invites, respond } = useInbox(refreshTeams);
+  const { requests: incoming, respond: respondToSeatRequest } = useSeatRequests(refreshTeams);
   const chat = useConversation({ myName: profile.name, onTeamChanged: refreshTeams });
   const [paletteOpen, setPaletteOpen] = useState(false);
 
@@ -48,6 +50,7 @@ export default function AppShell() {
     { id: 'find', label: 'Find teammates', run: () => navigate('/app/find') },
     { id: 'build', label: 'Build a team', run: () => { navigate('/app/find'); startBuilder(); } },
     { id: 'teams', label: 'Teams and invitations', run: () => navigate('/app/teams') },
+    { id: 'community', label: 'Open seats board', run: () => navigate('/app/community') },
     { id: 'me', label: 'My profile and memory', run: () => navigate('/app/me') },
     { id: 'new', label: 'Start a new chat', run: () => { reset(); navigate('/app/find'); } },
     { id: 'home', label: 'Go to the home page', run: () => navigate('/') },
@@ -59,7 +62,10 @@ export default function AppShell() {
     { id: 'out', label: 'Sign out', run: signOut },
   ], [navigate, reset, send, startBuilder, signOut]);
 
-  const shared = { profile, chat, teams, invites, respondToInvite: respond, openPalette };
+  const shared = {
+    profile, chat, teams, invites, respondToInvite: respond, openPalette,
+    incoming, respondToSeatRequest, refreshTeams,
+  };
 
   return (
     <div className="shell">
@@ -69,7 +75,8 @@ export default function AppShell() {
         </Link>
         <nav className="nav" aria-label="Main">
           <NavItem to="/app/find" label="Find teammates" />
-          <NavItem to="/app/teams" label="Teams" badge={invites.length} />
+          <NavItem to="/app/teams" label="Teams" badge={invites.length + incoming.length} />
+          <NavItem to="/app/community" label="Open seats" />
           <NavItem to="/app/me" label="Me" />
         </nav>
         <div className="rail-user">

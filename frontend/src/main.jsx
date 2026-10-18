@@ -10,6 +10,7 @@ import './styles/palette.css';
 import './styles/shell.css';
 import './styles/chat.css';
 import './styles/panels.css';
+import './styles/board.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

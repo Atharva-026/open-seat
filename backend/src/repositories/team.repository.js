@@ -203,3 +203,12 @@ export async function getSkillsForPeople(logins) {
   );
   return res.data;
 }
+
+export async function addMember(teamId, login) {
+  const graph = await getGraph();
+  await graph.query(
+    `MATCH (t:Team {id: $teamId}), (p:Person {githubLogin: $login})
+     MERGE (p)-[:MEMBER_OF]->(t)`,
+    { params: { teamId, login } }
+  );
+}

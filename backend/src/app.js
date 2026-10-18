@@ -9,6 +9,7 @@ import teamRoutes from './routes/team.routes.js';
 import agentRoutes from './routes/agent.routes.js';
 import memoryRoutes from './routes/memory.routes.js';
 import inviteRoutes from './routes/invite.routes.js';
+import seatRoutes from './routes/seat.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 export function createApp() {
@@ -25,6 +26,7 @@ export function createApp() {
   app.use('/api', agentRoutes);
   app.use('/api', memoryRoutes);
   app.use('/api', inviteRoutes);
+  app.use('/api', seatRoutes);
 
   app.use(errorHandler);
   return app;

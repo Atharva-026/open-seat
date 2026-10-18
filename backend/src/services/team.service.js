@@ -5,6 +5,8 @@ import * as teamRepository from '../repositories/team.repository.js';
 import { getProfile } from './profile.service.js';
 import { sendInvites } from './outreach.service.js';
 import { bus, EVENTS } from '../agents/events.js';
+import { evidenceFor } from '../utils/evidence.js';
+import * as seatRepository from '../repositories/seat.repository.js';
 
 const HACKATHON = { id: 'graph-hacks-2026', name: 'Graph Hacks 2026' };
 const MAX_TEAM_SIZE = 4;
@@ -50,23 +52,20 @@ export async function listTeams(me) {
 
   const ids = teams.map((t) => t.id);
   const logins = [...new Set(teams.flatMap((t) => t.members.map((m) => m.githubLogin)))];
-  const [invites, events, skillRows] = await Promise.all([
+  const [invites, events, skillRows, seats] = await Promise.all([
     teamRepository.getInvitesForTeams(ids),
     teamRepository.getEventsForTeams(ids),
     teamRepository.getSkillsForPeople(logins),
+    seatRepository.getSeatsForTeams(ids),
   ]);
-  const evidenceFor = (login) =>
-    skillRows
-      .filter((row) => row.login === login)
-      .slice(0, 3)
-      .map(({ name, level, evidence }) => ({ name, level, repos: (evidence ?? []).slice(0, 3) }));
 
   return teams.map((team) => ({
     ...team,
     size: team.size ?? MAX_TEAM_SIZE, // older teams can grow up to the maximum
-    members: team.members.map((m) => ({ ...m, evidence: evidenceFor(m.githubLogin) })),
+    members: team.members.map((m) => ({ ...m, evidence: evidenceFor(skillRows, m.githubLogin) })),
     invites: invites.filter((i) => i.teamId === team.id),
     events: events.filter((e) => e.teamId === team.id),
+    seats: seats.filter((s) => s.teamId === team.id),
   }));
 }
 

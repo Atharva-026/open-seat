@@ -61,3 +61,39 @@ export async function insertTeamedWith(pairs) {
     { params: { pairs } }
   );
 }
+
+export async function clearDemoBoard() {
+  const graph = await getGraph();
+  await graph.query("MATCH (t:Team) WHERE t.id STARTS WITH 'demo-board-' DETACH DELETE t");
+  await graph.query('MATCH (s:Seat) WHERE s.isDemo = true DETACH DELETE s');
+}
+
+export async function insertBoard(teams) {
+  const graph = await getGraph();
+  await graph.query(
+    `MERGE (h:Hackathon {id: 'graph-hacks-2026'})
+     SET h.name = 'Graph Hacks 2026'
+     WITH h
+     UNWIND $teams AS t
+     CREATE (tm:Team {id: t.id, name: t.name, status: 'confirmed', outcome: 'in progress',
+                      createdBy: t.createdBy, size: t.size, createdAt: $now - t.agoMs, isDemo: true})
+     CREATE (tm)-[:ENTERED]->(h)
+     WITH tm, t
+     UNWIND t.members AS login
+     MATCH (p:Person {githubLogin: login})
+     MERGE (p)-[:MEMBER_OF]->(tm)`,
+    { params: { teams, now: Date.now() } }
+  );
+  await graph.query(
+    `UNWIND $teams AS t
+     MATCH (tm:Team {id: t.id})
+     CREATE (s:Seat {id: t.seatId, title: t.seatTitle, pitch: t.seatPitch, status: 'open',
+                     postedAt: $now - t.agoMs, isDemo: true})
+     CREATE (tm)-[:POSTED]->(s)
+     WITH s, t
+     UNWIND t.seatSkills AS skillName
+     MATCH (k:Skill {name: skillName})
+     CREATE (s)-[:NEEDS]->(k)`,
+    { params: { teams, now: Date.now() } }
+  );
+}

@@ -4,17 +4,12 @@ import { bus, EVENTS } from '../agents/events.js';
 import { draftInvite } from '../agents/outreach/outreach.agent.js';
 import * as teamRepository from '../repositories/team.repository.js';
 import { getProfile } from './profile.service.js';
+import { demoWouldAccept } from '../utils/demoReply.js';
 
 const AGENT = 'Outreach agent';
 
 const log = (teamId, action, detail) =>
   teamRepository.addEvent({ id: crypto.randomUUID(), teamId, agent: AGENT, action, detail });
-
-// Demo personas reply on their own, deterministically. Every such reply is labelled simulated.
-function demoWouldAccept(login, teamId) {
-  const byte = crypto.createHash('sha1').update(`${login}:${teamId}`).digest()[0];
-  return byte % 5 !== 0;
-}
 
 async function resolveIfComplete(teamId) {
   if ((await teamRepository.countPendingInvites(teamId)) > 0) return;

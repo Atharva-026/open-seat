@@ -19,3 +19,13 @@ export async function countPeopleByCategory(excludeLogin) {
   );
   return res.data;
 }
+
+export async function getSkillLevels(githubLogin) {
+  const graph = await getGraph();
+  const res = await graph.roQuery(
+    `MATCH (:Person {githubLogin: $githubLogin})-[r:HAS_SKILL]->(s:Skill)
+     RETURN s.name AS name, r.level AS level`,
+    { params: { githubLogin } }
+  );
+  return res.data;
+}
